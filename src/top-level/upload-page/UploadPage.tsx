@@ -1138,6 +1138,475 @@ export function UploadPage({
         </div>
       )}
 
+      {/* Main Results Table */}
+      {results.length > 0 && (
+        <div className="glass-card overflow-hidden">
+          {/* Bulk Actions Bar */}
+          {bulkSelectedRows.size > 0 && (
+            <div
+              className={`px-6 py-4 border-b flex items-center justify-between ${
+                darkMode
+                  ? "bg-blue-900/20 border-blue-700/50"
+                  : "bg-blue-50 border-blue-200"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="font-semibold text-blue-900">
+                  {bulkSelectedRows.size} item{bulkSelectedRows.size !== 1 ? "s" : ""} selected
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={clearBulkSelection}
+                  className="px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors"
+                >
+                  Clear Selection
+                </button>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      applyBulkServiceLevel(Number(e.target.value));
+                    }
+                  }}
+                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white"
+                  defaultValue=""
+                >
+                  <option value="">Apply Service Level...</option>
+                  {ALL_LEVELS.map((level) => (
+                    <option key={level} value={level}>
+                      Level {level}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      applyBulkLab(e.target.value);
+                    }
+                  }}
+                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white"
+                  defaultValue=""
+                >
+                  <option value="">Apply Lab...</option>
+                  {Array.from(
+                    new Set(
+                      results
+                        .flatMap((r) => r.labs)
+                        .filter((lab) => lab && lab.trim() !== "")
+                    )
+                  ).map((lab) => (
+                    <option key={lab} value={lab}>
+                      {lab}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => applyBulkBasePrice(true)}
+                  className="px-3 py-1.5 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+                >
+                  Apply Base Price
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead
+                className={`${
+                  darkMode
+                    ? "bg-gradient-to-r from-gray-800 to-gray-900"
+                    : "bg-gradient-to-r from-gray-50 to-gray-100"
+                }`}
+              >
+                <tr>
+                  <th className="px-4 py-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={
+                        results.length > 0 &&
+                        bulkSelectedRows.size === results.length
+                      }
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          selectAllRows();
+                        } else {
+                          clearBulkSelection();
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                    />
+                  </th>
+                  <th
+                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Item
+                  </th>
+                  <th
+                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Match
+                  </th>
+                  <th
+                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Service Level
+                  </th>
+                  <th
+                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Pricing
+                  </th>
+                  <th
+                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Lab
+                  </th>
+                  <th
+                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {results.map((result, rowIndex) => {
+                  const isExpanded = expandedRows.has(rowIndex);
+                  const selectedMatch = getSelectedMatch(rowIndex);
+                  const selectedServiceLevels = getSelectedServiceLevels(rowIndex);
+                  const selectedPrice = getSelectedPrice(rowIndex);
+                  const selectedLab = getSelectedLab(rowIndex);
+                  const isBulkSelected = bulkSelectedRows.has(rowIndex);
+                  const isExcluded = excludedItems.has(rowIndex);
+                  const isResearch = researchItems.has(rowIndex);
+                  const isTMS = tmsLabs.has(rowIndex);
+
+                  // Get eligible labs for this unit
+                  const eligibleLabs = selectedMatch
+                    ? getEligibleLabsForUnitWithOverrides({
+                        partNumber: selectedMatch.part_number,
+                        requiredCapabilityTags:
+                          selectedMatch.requiredCapabilityTags,
+                      })
+                    : [];
+
+                  // Get pricing rows
+                  const pricingRows = selectedMatch
+                    ? generatePricingRows(selectedMatch.pricing)
+                    : [];
+
+                  return (
+                    <React.Fragment key={rowIndex}>
+                      <tr
+                        className={`${
+                          isBulkSelected
+                            ? darkMode
+                              ? "bg-blue-900/20"
+                              : "bg-blue-50"
+                            : darkMode
+                            ? "hover:bg-gray-800"
+                            : "hover:bg-gray-50"
+                        } transition-colors ${
+                          isExcluded ? "opacity-50" : ""
+                        }`}
+                      >
+                        {/* Checkbox */}
+                        <td className="px-4 py-4">
+                          <input
+                            type="checkbox"
+                            checked={isBulkSelected}
+                            onChange={() => toggleBulkSelect(rowIndex)}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                          />
+                        </td>
+
+                        {/* Item Info */}
+                        <td className="px-4 py-4">
+                          <div className="flex flex-col gap-1">
+                            <div
+                              className={`font-semibold ${
+                                darkMode ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              {result.customerItem.manufacturer} -{" "}
+                              {result.customerItem.model}
+                            </div>
+                            <div
+                              className={`text-xs ${
+                                darkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
+                            >
+                              Row {result.customerItem.row} • Qty:{" "}
+                              {result.customerItem.quantity || 1}
+                              {result.customerItem.notes && (
+                                <> • {result.customerItem.notes}</>
+                              )}
+                            </div>
+                            {result.matchedUnits.length === 0 && (
+                              <span className="text-xs text-red-600 font-medium">
+                                ⚠️ No matches found
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Match Selection */}
+                        <td className="px-4 py-4">
+                          {result.matchedUnits.length > 0 ? (
+                            <select
+                              value={selectedMatch?.id || ""}
+                              onChange={(e) => {
+                                const unit = result.matchedUnits.find(
+                                  (u) => u.id === e.target.value
+                                );
+                                if (unit) {
+                                  onSelectMatch(rowIndex, unit);
+                                }
+                              }}
+                              className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                                darkMode
+                                  ? "bg-gray-800 border-gray-600 text-white"
+                                  : "bg-white border-gray-300"
+                              }`}
+                            >
+                              <option value="">Select match...</option>
+                              {result.matchedUnits.map((unit) => (
+                                <option key={unit.id} value={unit.id}>
+                                  {unit.part_number} - {unit.manufacturer}{" "}
+                                  {unit.model_number}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <button
+                              onClick={() => onManualMatch(rowIndex)}
+                              className="px-3 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                            >
+                              🔧 Manual Match
+                            </button>
+                          )}
+                        </td>
+
+                        {/* Service Level */}
+                        <td className="px-4 py-4">
+                          {selectedMatch ? (
+                            <ServiceLevelSelector
+                              rowIndex={rowIndex}
+                              selectedLevels={selectedServiceLevels}
+                              onUpdateServiceLevel={updateServiceLevel}
+                              onUpdateServiceLevels={updateServiceLevels}
+                              onToggleServiceLevel={toggleServiceLevel}
+                              onToggleMultiSelectMode={toggleMultiSelectMode}
+                              isMultiSelect={
+                                multiSelectMode.get(rowIndex) || false
+                              }
+                              darkMode={darkMode}
+                            />
+                          ) : (
+                            <span
+                              className={`text-sm ${
+                                darkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
+                            >
+                              Select match first
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Pricing */}
+                        <td className="px-4 py-4">
+                          {selectedMatch && pricingRows.length > 0 ? (
+                            <div className="flex flex-col gap-1">
+                              <input
+                                type="number"
+                                value={selectedPrice || ""}
+                                onChange={(e) => {
+                                  const price = parseFloat(e.target.value);
+                                  if (!isNaN(price) && price > 0) {
+                                    updatePrice(rowIndex, price);
+                                  }
+                                }}
+                                placeholder="Enter price"
+                                className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                                  darkMode
+                                    ? "bg-gray-800 border-gray-600 text-white"
+                                    : "bg-white border-gray-300"
+                                }`}
+                              />
+                              <button
+                                onClick={() => {
+                                  const currentLevel = getSelectedServiceLevel(rowIndex);
+                                  const pricingForLevel = pricingRows.find(
+                                    (p) => p.service_level === currentLevel
+                                  );
+                                  if (pricingForLevel) {
+                                    updatePrice(rowIndex, pricingForLevel.base_price_usd);
+                                  }
+                                }}
+                                className="text-xs text-blue-600 hover:text-blue-800 text-left"
+                              >
+                                Use Base Price
+                              </button>
+                            </div>
+                          ) : (
+                            <span
+                              className={`text-sm ${
+                                darkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
+                            >
+                              —
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Lab Selection */}
+                        <td className="px-4 py-4">
+                          {selectedMatch && eligibleLabs.length > 0 ? (
+                            <select
+                              value={selectedLab || ""}
+                              onChange={(e) => updateLab(rowIndex, e.target.value)}
+                              className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                                darkMode
+                                  ? "bg-gray-800 border-gray-600 text-white"
+                                  : "bg-white border-gray-300"
+                              }`}
+                            >
+                              <option value="">Select lab...</option>
+                              {eligibleLabs.map((lab) => (
+                                <option key={lab.labName} value={lab.labName}>
+                                  {lab.labName}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <span
+                              className={`text-sm ${
+                                darkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
+                            >
+                              —
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-2">
+                            {selectedMatch && (
+                              <button
+                                onClick={() => setModalRowIndex(rowIndex)}
+                                className="px-3 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                                title="View details"
+                              >
+                                📋 Details
+                              </button>
+                            )}
+                            <button
+                              onClick={() => onToggleRowExpansion(rowIndex)}
+                              className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                                isExpanded
+                                  ? "bg-gray-200 hover:bg-gray-300"
+                                  : "bg-gray-100 hover:bg-gray-200"
+                              }`}
+                              title={isExpanded ? "Collapse" : "Expand"}
+                            >
+                              {isExpanded ? "▼" : "▶"}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Expanded Row Content */}
+                      {isExpanded && selectedMatch && (
+                        <tr>
+                          <td colSpan={7} className="px-4 py-4">
+                            <div
+                              className={`p-4 rounded-lg border ${
+                                darkMode
+                                  ? "bg-gray-800 border-gray-600"
+                                  : "bg-gray-50 border-gray-200"
+                              }`}
+                            >
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Pricing Info */}
+                                <div>
+                                  <h4
+                                    className={`font-semibold mb-2 ${
+                                      darkMode ? "text-white" : "text-gray-900"
+                                    }`}
+                                  >
+                                    Available Pricing
+                                  </h4>
+                                  <div className="space-y-1">
+                                    {pricingRows
+                                      .slice(0, 5)
+                                      .map((p) => (
+                                        <div
+                                          key={p.service_level}
+                                          className={`text-sm ${
+                                            darkMode
+                                              ? "text-gray-300"
+                                              : "text-gray-700"
+                                          }`}
+                                        >
+                                          Level {p.service_level}: {money(p.base_price_usd)}
+                                        </div>
+                                      ))}
+                                  </div>
+                                </div>
+
+                                {/* Lab Info */}
+                                <div>
+                                  <h4
+                                    className={`font-semibold mb-2 ${
+                                      darkMode ? "text-white" : "text-gray-900"
+                                    }`}
+                                  >
+                                    Available Labs ({eligibleLabs.length})
+                                  </h4>
+                                  <div className="space-y-1">
+                                    {eligibleLabs.slice(0, 5).map((lab) => (
+                                      <div
+                                        key={lab.labName}
+                                        className={`text-sm ${
+                                          darkMode
+                                            ? "text-gray-300"
+                                            : "text-gray-700"
+                                        }`}
+                                      >
+                                        {lab.labName}
+                                        {lab.isAccredited && " ✓ Accredited"}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* Details Modal */}
       {modalRowIndex !== null && getSelectedMatch(modalRowIndex) && (
         <UnitDetailsModal
