@@ -1140,133 +1140,236 @@ export function UploadPage({
 
       {/* Main Results Table */}
       {results.length > 0 && (
-        <div className="mt-6 glass-card overflow-hidden animate-fade-in">
+        <>
+          {/* Table Header with Actions */}
+          <div className="flex items-center justify-between mb-4">
+            <h2
+              className={`text-xl font-bold ${
+                darkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Match Results ({results.length} items)
+            </h2>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={selectAllRows}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  darkMode
+                    ? "bg-purple-600 hover:bg-purple-700 text-white"
+                    : "bg-purple-100 hover:bg-purple-200 text-purple-700"
+                }`}
+              >
+                Select All
+              </button>
+              <button
+                onClick={exportResults}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 border ${
+                  darkMode
+                    ? "bg-gray-800 border-gray-600 hover:bg-gray-700 text-white"
+                    : "bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
+                }`}
+              >
+                Export Results
+              </button>
+            </div>
+          </div>
+
           {/* Bulk Actions Bar */}
           {bulkSelectedRows.size > 0 && (
             <div
-              className={`px-6 py-4 border-b flex items-center justify-between ${
+              className={`mb-4 glass-card p-6 rounded-xl ${
                 darkMode
-                  ? "bg-gradient-to-r from-blue-900/30 to-blue-800/30 border-blue-700/50"
-                  : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200"
+                  ? "bg-purple-900/20 border-purple-700/50"
+                  : "bg-purple-50 border-purple-200"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`font-semibold ${
-                    darkMode ? "text-blue-200" : "text-blue-900"
-                  }`}
-                >
-                  ✓ {bulkSelectedRows.size} item{bulkSelectedRows.size !== 1 ? "s" : ""} selected
-                </span>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🎯</span>
+                  <div>
+                    <h3
+                      className={`font-semibold ${
+                        darkMode ? "text-purple-200" : "text-purple-900"
+                      }`}
+                    >
+                      Bulk Actions
+                    </h3>
+                  </div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      darkMode
+                        ? "bg-blue-600 text-white"
+                        : "bg-blue-500 text-white"
+                    }`}
+                  >
+                    {bulkSelectedRows.size} selected
+                  </span>
+                </div>
                 <button
                   onClick={clearBulkSelection}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 active:scale-95 ${
-                    darkMode
-                      ? "bg-gray-700 hover:bg-gray-600 text-white"
-                      : "bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
+                  className={`text-sm font-medium ${
+                    darkMode ? "text-purple-300 hover:text-purple-200" : "text-purple-700 hover:text-purple-900"
                   }`}
                 >
                   Clear Selection
                 </button>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      applyBulkServiceLevel(Number(e.target.value));
-                    }
-                  }}
-                  className={`px-4 py-2 text-sm border rounded-lg transition-all duration-200 ${
-                    darkMode
-                      ? "bg-gray-800 border-gray-600 text-white"
-                      : "bg-white border-gray-300 text-gray-900"
-                  }`}
-                  defaultValue=""
-                >
-                  <option value="">Apply Service Level...</option>
-                  {ALL_LEVELS.map((level) => (
-                    <option key={level} value={level}>
-                      Level {level}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      applyBulkLab(e.target.value);
-                    }
-                  }}
-                  className={`px-4 py-2 text-sm border rounded-lg transition-all duration-200 ${
-                    darkMode
-                      ? "bg-gray-800 border-gray-600 text-white"
-                      : "bg-white border-gray-300 text-gray-900"
-                  }`}
-                  defaultValue=""
-                >
-                  <option value="">Apply Lab...</option>
-                  {Array.from(
-                    new Set(
-                      results
-                        .flatMap((r) => r.labs)
-                        .filter((lab) => lab && lab.trim() !== "")
-                    )
-                  ).map((lab) => (
-                    <option key={lab} value={lab}>
-                      {lab}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={() => applyBulkBasePrice(true)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 active:scale-95 ${
-                    darkMode
-                      ? "bg-green-600 hover:bg-green-700 text-white"
-                      : "bg-green-500 hover:bg-green-600 text-white"
-                  }`}
-                >
-                  Apply Base Price
-                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${
+                      darkMode ? "text-purple-200" : "text-purple-900"
+                    }`}
+                  >
+                    Apply Lab with Proximity Fallback
+                  </label>
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        applyBulkLab(e.target.value);
+                      }
+                    }}
+                    className={`w-full px-4 py-2 text-sm border rounded-lg ${
+                      darkMode
+                        ? "bg-gray-800 border-gray-600 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                    defaultValue=""
+                  >
+                    <option value="">Select preferred lab...</option>
+                    {Array.from(
+                      new Set(
+                        results
+                          .flatMap((r) => r.labs)
+                          .filter((lab) => lab && lab.trim() !== "")
+                      )
+                    ).map((lab) => (
+                      <option key={lab} value={lab}>
+                        {lab}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500 flex items-center gap-1">
+                    <span className="text-blue-500">ℹ</span>
+                    Uses closest alternative if selected lab lacks capability
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${
+                      darkMode ? "text-purple-200" : "text-purple-900"
+                    }`}
+                  >
+                    Apply Service Level to Selected Items
+                  </label>
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        applyBulkServiceLevel(Number(e.target.value));
+                      }
+                    }}
+                    className={`w-full px-4 py-2 text-sm border rounded-lg ${
+                      darkMode
+                        ? "bg-gray-800 border-gray-600 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                    defaultValue=""
+                  >
+                    <option value="">Select service level...</option>
+                    {ALL_LEVELS.map((level) => (
+                      <option key={level} value={level}>
+                        Level {level}: {SERVICE_LEVEL_DESC[level]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${
+                      darkMode ? "text-purple-200" : "text-purple-900"
+                    }`}
+                  >
+                    Apply Base Price to Selected Items
+                  </label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => applyBulkBasePrice(true)}
+                      className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                        darkMode
+                          ? "bg-blue-600 hover:bg-blue-700 text-white"
+                          : "bg-blue-100 hover:bg-blue-200 text-blue-700"
+                      }`}
+                    >
+                      <span className="text-orange-500 mr-1">$</span>
+                      Base Price
+                    </button>
+                    <button
+                      onClick={() => applyBulkBasePrice(false)}
+                      className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                        darkMode
+                          ? "bg-purple-600 hover:bg-purple-700 text-white"
+                          : "bg-purple-100 hover:bg-purple-200 text-purple-700"
+                      }`}
+                    >
+                      <span className="text-blue-500 mr-1">💎</span>
+                      Base + Options
+                    </button>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500 flex items-center gap-1">
+                    <span className="text-blue-500">ℹ</span>
+                    Applies to current service level for each item
+                  </p>
+                </div>
               </div>
             </div>
           )}
 
           {/* Table */}
-          <div className="overflow-x-auto scrollbar-modern">
-            <table className="w-full text-sm">
-              <thead
-                className={`${
-                  darkMode
-                    ? "bg-gradient-to-r from-gray-800 to-gray-900"
-                    : "bg-gradient-to-r from-gray-50 to-gray-100"
-                }`}
-              >
-                <tr className={`text-left ${darkMode ? "text-gray-300" : "text-gray-600"} font-semibold uppercase text-xs tracking-wide`}>
-                  <th className="py-4 px-4 w-12">
-                    <input
-                      type="checkbox"
-                      checked={
-                        results.length > 0 &&
-                        bulkSelectedRows.size === results.length
-                      }
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          selectAllRows();
-                        } else {
-                          clearBulkSelection();
+          <div className="mt-6 glass-card overflow-hidden animate-fade-in">
+            <div className="overflow-x-auto scrollbar-modern">
+              <table className="w-full text-sm">
+                <thead
+                  className={`${
+                    darkMode
+                      ? "bg-gradient-to-r from-gray-800 to-gray-900"
+                      : "bg-gradient-to-r from-gray-50 to-gray-100"
+                  }`}
+                >
+                  <tr className={`text-left ${darkMode ? "text-gray-300" : "text-gray-600"} font-semibold uppercase text-xs tracking-wide`}>
+                    <th className="py-4 px-4 w-12">
+                      <input
+                        type="checkbox"
+                        checked={
+                          results.length > 0 &&
+                          bulkSelectedRows.size === results.length
                         }
-                      }}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                    />
-                  </th>
-                  <th className="py-4 px-4">Item</th>
-                  <th className="py-4 px-4">Match</th>
-                  <th className="py-4 px-4">Service Level</th>
-                  <th className="py-4 px-4">Pricing</th>
-                  <th className="py-4 px-4">Lab</th>
-                  <th className="py-4 px-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            selectAllRows();
+                          } else {
+                            clearBulkSelection();
+                          }
+                        }}
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                      />
+                    </th>
+                    <th className="py-4 px-4">Row</th>
+                    <th className="py-4 px-4">Manufacturer</th>
+                    <th className="py-4 px-4">Model</th>
+                    <th className="py-4 px-4">Service Level</th>
+                    <th className="py-4 px-4">Best Match PN</th>
+                    <th className="py-4 px-4">Standards</th>
+                    <th className="py-4 px-4">Lab Capacity</th>
+                    <th className="py-4 px-4">Selected Price</th>
+                    <th className="py-4 px-4">Turn Time</th>
+                    <th className="py-4 px-4">Labs</th>
+                    <th className="py-4 px-4">Capabilities</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
                 {results.map((result, rowIndex) => {
                   const isExpanded = expandedRows.has(rowIndex);
                   const selectedMatch = getSelectedMatch(rowIndex);
@@ -1277,6 +1380,10 @@ export function UploadPage({
                   const isExcluded = excludedItems.has(rowIndex);
                   const isResearch = researchItems.has(rowIndex);
                   const isTMS = tmsLabs.has(rowIndex);
+                  const tmsVendor = tmsVendors.get(rowIndex);
+                  const tmsPrice = tmsPrices.get(rowIndex);
+                  const tmsTurnTime = tmsTurnTimes.get(rowIndex);
+                  const isTransfer = transferLabs && transferLabs.has(rowIndex);
 
                   // Get eligible labs for this unit
                   const eligibleLabs = selectedMatch
@@ -1292,18 +1399,69 @@ export function UploadPage({
                     ? generatePricingRows(selectedMatch.pricing)
                     : [];
 
+                  // Get standards count and onsite capability
+                  const standardsCount = selectedMatch
+                    ? getStandardsForPN(selectedMatch.part_number).length
+                    : 0;
+                  const supportsOnsite = selectedMatch
+                    ? supportsOnsiteCalibration(selectedMatch.part_number)
+                    : false;
+
+                  // Get selected lab capability info
+                  const selectedLabCap = selectedLab
+                    ? eligibleLabs.find((l) => l.labName === selectedLab)
+                    : null;
+
+                  // Get lab capacity
+                  const labCapacity = selectedLabCap
+                    ? LAB_CAPACITY[selectedLabCap.labName] || 0
+                    : null;
+                  const capacityColor = labCapacity !== null
+                    ? getCapacityColor(labCapacity)
+                    : "";
+                  const capacityTextColor = labCapacity !== null
+                    ? getCapacityTextColor(labCapacity)
+                    : "";
+
+                  // Get turn time
+                  const turnTime = isTMS
+                    ? tmsTurnTime
+                    : selectedLabCap
+                    ? selectedLabCap.recalTT
+                    : null;
+
+                  // Calculate base price for current service level
+                  const currentServiceLevel = getSelectedServiceLevel(rowIndex);
+                  const basePrice = selectedMatch && pricingRows.length > 0
+                    ? pricingRows.find((p) => p.service_level === currentServiceLevel)?.base_price_usd
+                    : null;
+
+                  // Determine if exact match
+                  const isExactMatch = selectedMatch && result.matchedUnits.length > 0;
+
+                  // Get capability status
+                  const capabilityStatus = selectedLabCap
+                    ? selectedLabCap.isAccredited
+                      ? "Accredited"
+                      : "Non-Accredited"
+                    : null;
+
                   return (
                     <React.Fragment key={rowIndex}>
                       <tr
                         className={`${
                           isBulkSelected
                             ? darkMode
-                              ? "bg-blue-900/30"
-                              : "bg-blue-50/50"
+                              ? "bg-blue-100"
+                              : "bg-blue-50"
+                            : rowIndex % 2 === 0
+                            ? darkMode
+                              ? "bg-gray-900/50"
+                              : "bg-white"
                             : darkMode
-                            ? "hover:bg-gradient-to-r hover:from-blue-900/20 hover:to-transparent"
-                            : "hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-transparent"
-                        } transition-all duration-200 group cursor-pointer ${
+                            ? "bg-gray-800/30"
+                            : "bg-gray-50/50"
+                        } transition-all duration-200 group hover:bg-blue-50/50 ${
                           isExcluded ? "opacity-50" : ""
                         }`}
                       >
@@ -1317,223 +1475,279 @@ export function UploadPage({
                           />
                         </td>
 
-                        {/* Item Info */}
+                        {/* Row Number with Gear Icon */}
                         <td className="py-4 px-4">
-                          <div className="flex flex-col gap-1">
-                            <div
-                              className={`font-semibold group-hover:text-blue-600 transition-colors ${
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`font-bold ${
                                 darkMode ? "text-white" : "text-gray-900"
                               }`}
                             >
-                              {result.customerItem.manufacturer} -{" "}
-                              {result.customerItem.model}
-                            </div>
-                            <div
-                              className={`text-xs ${
-                                darkMode ? "text-gray-400" : "text-gray-600"
-                              }`}
-                            >
-                              Row {result.customerItem.row} • Qty:{" "}
-                              {result.customerItem.quantity || 1}
-                              {result.customerItem.notes && (
-                                <> • {result.customerItem.notes}</>
-                              )}
-                            </div>
-                            {result.matchedUnits.length === 0 && (
-                              <span className="text-xs text-red-600 font-medium mt-1">
-                                ⚠️ No matches found
-                              </span>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* Match Selection */}
-                        <td className="py-4 px-4">
-                          {result.matchedUnits.length > 0 ? (
-                            <select
-                              value={selectedMatch?.id || ""}
-                              onChange={(e) => {
-                                const unit = result.matchedUnits.find(
-                                  (u) => u.id === e.target.value
-                                );
-                                if (unit) {
-                                  onSelectMatch(rowIndex, unit);
-                                }
-                              }}
-                              className={`w-full px-3 py-2 text-sm border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 ${
-                                darkMode
-                                  ? "bg-gray-800/50 border-gray-600 text-white hover:bg-gray-800"
-                                  : "bg-white/80 border-gray-300 hover:bg-white"
-                              }`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <option value="">Select match...</option>
-                              {result.matchedUnits.map((unit) => (
-                                <option key={unit.id} value={unit.id}>
-                                  {unit.part_number} - {unit.manufacturer}{" "}
-                                  {unit.model_number}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onManualMatch(rowIndex);
-                              }}
-                              className="px-4 py-2 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 active:scale-95"
-                            >
-                              🔧 Manual Match
-                            </button>
-                          )}
-                        </td>
-
-                        {/* Service Level */}
-                        <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
-                          {selectedMatch ? (
-                            <ServiceLevelSelector
-                              rowIndex={rowIndex}
-                              selectedLevels={selectedServiceLevels}
-                              onUpdateServiceLevel={updateServiceLevel}
-                              onUpdateServiceLevels={updateServiceLevels}
-                              onToggleServiceLevel={toggleServiceLevel}
-                              onToggleMultiSelectMode={toggleMultiSelectMode}
-                              isMultiSelect={
-                                multiSelectMode.get(rowIndex) || false
-                              }
-                              darkMode={darkMode}
-                            />
-                          ) : (
-                            <span
-                              className={`text-sm italic ${
-                                darkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
-                            >
-                              Select match first
+                              {result.customerItem.row || rowIndex + 1}
                             </span>
-                          )}
-                        </td>
-
-                        {/* Pricing */}
-                        <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
-                          {selectedMatch && pricingRows.length > 0 ? (
-                            <div className="flex flex-col gap-1.5 min-w-[140px]">
-                              <input
-                                type="number"
-                                value={selectedPrice || ""}
-                                onChange={(e) => {
-                                  const price = parseFloat(e.target.value);
-                                  if (!isNaN(price) && price > 0) {
-                                    updatePrice(rowIndex, price);
-                                  } else if (e.target.value === "") {
-                                    updatePrice(rowIndex, 0);
-                                  }
-                                }}
-                                placeholder="$0.00"
-                                className={`w-full px-3 py-2 text-sm border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 ${
-                                  darkMode
-                                    ? "bg-gray-800/50 border-gray-600 text-white hover:bg-gray-800"
-                                    : "bg-white/80 border-gray-300 hover:bg-white"
-                                }`}
-                              />
-                              <button
-                                onClick={() => {
-                                  const currentLevel = getSelectedServiceLevel(rowIndex);
-                                  const pricingForLevel = pricingRows.find(
-                                    (p) => p.service_level === currentLevel
-                                  );
-                                  if (pricingForLevel) {
-                                    updatePrice(rowIndex, pricingForLevel.base_price_usd);
-                                  }
-                                }}
-                                className="text-xs text-blue-600 hover:text-blue-800 font-medium text-left transition-colors"
-                              >
-                                Use Base Price
-                              </button>
-                            </div>
-                          ) : (
-                            <span
-                              className={`text-sm italic ${
-                                darkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
-                            >
-                              —
-                            </span>
-                          )}
-                        </td>
-
-                        {/* Lab Selection */}
-                        <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
-                          {selectedMatch && eligibleLabs.length > 0 ? (
-                            <select
-                              value={selectedLab || ""}
-                              onChange={(e) => updateLab(rowIndex, e.target.value)}
-                              className={`w-full px-3 py-2 text-sm border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 ${
-                                darkMode
-                                  ? "bg-gray-800/50 border-gray-600 text-white hover:bg-gray-800"
-                                  : "bg-white/80 border-gray-300 hover:bg-white"
-                              }`}
-                            >
-                              <option value="">Select lab...</option>
-                              {eligibleLabs.map((lab) => (
-                                <option key={lab.labName} value={lab.labName}>
-                                  {lab.labName}
-                                  {lab.isAccredited ? " ✓" : ""}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <span
-                              className={`text-sm italic ${
-                                darkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
-                            >
-                              —
-                            </span>
-                          )}
-                        </td>
-
-                        {/* Actions */}
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-2">
-                            {selectedMatch && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setModalRowIndex(rowIndex);
-                                }}
-                                className="px-4 py-2 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 active:scale-95"
-                                title="View details"
-                              >
-                                📋 Details
-                              </button>
-                            )}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onToggleRowExpansion(rowIndex);
                               }}
-                              className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 active:scale-95 ${
-                                isExpanded
-                                  ? darkMode
-                                    ? "bg-gray-700 hover:bg-gray-600 text-white"
-                                    : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                                  : darkMode
-                                  ? "bg-gray-800 hover:bg-gray-700 text-white"
-                                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                              }`}
-                              title={isExpanded ? "Collapse" : "Expand"}
+                              className="text-gray-400 hover:text-gray-600"
                             >
-                              {isExpanded ? "▼" : "▶"}
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                              </svg>
                             </button>
                           </div>
+                        </td>
+
+                        {/* Manufacturer with Exact Match Badge */}
+                        <td className="py-4 px-4">
+                          <div className="flex flex-col gap-1">
+                            <div
+                              className={`font-semibold ${
+                                darkMode ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              {result.customerItem.manufacturer}
+                            </div>
+                            {isExactMatch && selectedMatch && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium w-fit">
+                                <span>✓</span>
+                                <span>Exact Match</span>
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Model with Quantity/C-of-C */}
+                        <td className="py-4 px-4">
+                          <div className="flex flex-col gap-1">
+                            <div
+                              className={`font-medium ${
+                                darkMode ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              {result.customerItem.model}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="font-bold text-gray-700">
+                                {result.customerItem.quantity || 1}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {SERVICE_LEVEL_DESC[currentServiceLevel]?.split(" ")[0] || "C-of-C"}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Service Level */}
+                        <td className="py-4 px-4">
+                          {selectedMatch ? (
+                            <div className="flex flex-col gap-1">
+                              <span
+                                className={`font-semibold ${
+                                  darkMode ? "text-white" : "text-gray-900"
+                                }`}
+                              >
+                                {currentServiceLevel}
+                              </span>
+                              <span className="text-xs text-gray-600">
+                                {SERVICE_LEVEL_DESC[currentServiceLevel] || ""}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </td>
+
+                        {/* Best Match PN with Info Icon and Price */}
+                        <td className="py-4 px-4">
+                          {selectedMatch ? (
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1">
+                                <span
+                                  className={`font-semibold ${
+                                    darkMode ? "text-white" : "text-gray-900"
+                                  }`}
+                                >
+                                  {selectedMatch.part_number}
+                                </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setModalRowIndex(rowIndex);
+                                  }}
+                                  className="text-blue-500 hover:text-blue-700"
+                                >
+                                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </div>
+                              {basePrice && (
+                                <span className="text-sm font-semibold text-green-600">
+                                  {money(basePrice)}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </td>
+
+                        {/* Standards with Onsite OK Badge */}
+                        <td className="py-4 px-4">
+                          {selectedMatch ? (
+                            <div className="flex flex-col gap-1">
+                              <span className="text-sm text-gray-700">
+                                {standardsCount} standard{standardsCount !== 1 ? "s" : ""}
+                              </span>
+                              {supportsOnsite && (
+                                <span className="inline-flex items-center px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium w-fit">
+                                  Onsite OK
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </td>
+
+                        {/* Lab Capacity with Progress Bar */}
+                        <td className="py-4 px-4">
+                          {labCapacity !== null && selectedLab ? (
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{
+                                    width: `${labCapacity}%`,
+                                    backgroundColor: capacityColor,
+                                  }}
+                                />
+                              </div>
+                              <span
+                                className="text-sm font-medium"
+                                style={{ color: capacityTextColor }}
+                              >
+                                {labCapacity}%
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </td>
+
+                        {/* Selected Price */}
+                        <td className="py-4 px-4">
+                          {selectedPrice ? (
+                            <span className="text-sm font-semibold text-green-600">
+                              {money(selectedPrice)}
+                            </span>
+                          ) : isTMS && tmsPrice ? (
+                            <span className="text-sm font-semibold text-green-600">
+                              {money(tmsPrice)}
+                            </span>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (basePrice) {
+                                  updatePrice(rowIndex, basePrice);
+                                }
+                              }}
+                              className="text-sm text-gray-500 hover:text-gray-700 underline"
+                            >
+                              Click to select price
+                            </button>
+                          )}
+                        </td>
+
+                        {/* Turn Time with Colored Badge */}
+                        <td className="py-4 px-4">
+                          {turnTime !== null ? (
+                            <span
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                turnTime <= 5
+                                  ? "bg-green-100 text-green-700"
+                                  : turnTime <= 10
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {turnTime} day{turnTime !== 1 ? "s" : ""}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </td>
+
+                        {/* Labs with Location Pin and TMS Badges */}
+                        <td className="py-4 px-4">
+                          {isTMS && tmsVendor ? (
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1">
+                                <span className="text-red-500">📍</span>
+                                <span className="text-sm font-medium text-gray-900">
+                                  {tmsVendor}
+                                </span>
+                              </div>
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium w-fit">
+                                <span>🏢</span>
+                                <span>Transfer for TMS</span>
+                              </span>
+                            </div>
+                          ) : selectedLab ? (
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1">
+                                <span className="text-red-500">📍</span>
+                                <span className="text-sm font-medium text-gray-900">
+                                  {selectedLab}
+                                </span>
+                              </div>
+                              {isTransfer && (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium w-fit">
+                                  <span>↔</span>
+                                  <span>Transfer from {preferredLab || "Preferred Lab"}</span>
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (eligibleLabs.length > 0) {
+                                  updateLab(rowIndex, eligibleLabs[0].labName);
+                                }
+                              }}
+                              className="text-sm text-orange-600 hover:text-orange-700 underline"
+                            >
+                              Click to select lab
+                            </button>
+                          )}
+                        </td>
+
+                        {/* Capabilities with Status Badge */}
+                        <td className="py-4 px-4">
+                          {capabilityStatus ? (
+                            <span
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                capabilityStatus === "Accredited"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-gray-100 text-gray-700"
+                              }`}
+                            >
+                              {capabilityStatus}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
                         </td>
                       </tr>
 
                       {/* Expanded Row Content */}
                       {isExpanded && selectedMatch && (
                         <tr>
-                          <td colSpan={7} className="py-4 px-4">
+                          <td colSpan={12} className="py-4 px-4">
                             <div
                               className={`p-6 rounded-xl border shadow-sm ${
                                 darkMode
@@ -1617,6 +1831,7 @@ export function UploadPage({
             </table>
           </div>
         </div>
+        </>
       )}
 
       {/* Details Modal */}
