@@ -973,30 +973,68 @@ export function UploadPage({
             {/* Lab Distribution Donut Chart */}
             {(() => {
               const labCounts = new Map<string, number>();
+              
+              // Count regular labs
               results.forEach((_, i) => {
                 const lab = getSelectedLab(i);
-                if (lab) {
+                if (lab && !tmsLabs.has(i)) {
                   labCounts.set(lab, (labCounts.get(lab) || 0) + 1);
+                }
+              });
+
+              // Count TMS labs
+              tmsLabs.forEach((rowIndex) => {
+                const vendor = tmsVendors.get(rowIndex);
+                if (vendor) {
+                  const tmsLabel = `TMS - ${vendor}`;
+                  labCounts.set(tmsLabel, (labCounts.get(tmsLabel) || 0) + 1);
                 }
               });
 
               if (labCounts.size === 0) return null;
 
+              // Color mapping based on screenshot
+              const colorMap: Record<string, string> = {};
+              const colorPalette = [
+                "#3b82f6", // Blue - Phoenix Lab
+                "#10b981", // Green - Los Angeles Lab
+                "#f59e0b", // Orange - San Diego Lab
+                "#ef4444", // Red - TMS - Tektronix
+                "#8b5cf6", // Purple - TMS - Trescal
+                "#06b6d4", // Cyan
+                "#ec4899", // Pink
+                "#84cc16", // Lime
+              ];
+
               const chartData = Array.from(labCounts.entries()).map(
-                ([lab, count], i) => ({
-                  label: lab,
-                  value: count,
-                  color: [
-                    "#3b82f6",
-                    "#10b981",
-                    "#f59e0b",
-                    "#ef4444",
-                    "#8b5cf6",
-                    "#ec4899",
-                    "#06b6d4",
-                    "#84cc16",
-                  ][i % 8],
-                })
+                ([lab, count], i) => {
+                  // Assign colors based on lab name patterns
+                  let color = colorMap[lab];
+                  if (!color) {
+                    if (lab.includes("TMS - Tektronix")) {
+                      color = "#ef4444"; // Red
+                    } else if (lab.includes("TMS - Trescal")) {
+                      color = "#8b5cf6"; // Purple
+                    } else if (lab.includes("TMS")) {
+                      color = "#ef4444"; // Red for other TMS
+                    } else if (lab.includes("Phoenix")) {
+                      color = "#3b82f6"; // Blue
+                    } else if (lab.includes("Los Angeles")) {
+                      color = "#10b981"; // Green
+                    } else if (lab.includes("San Diego")) {
+                      color = "#f59e0b"; // Orange
+                    } else {
+                      color = colorPalette[i % colorPalette.length];
+                    }
+                    colorMap[lab] = color;
+                  }
+
+                  return {
+                    label: lab,
+                    value: count,
+                    color: color,
+                  };
+                }
               );
 
               return (
@@ -1009,59 +1047,84 @@ export function UploadPage({
             })()}
 
             {/* Cost Breakdown Bar Chart */}
-            {selectedPrices.size > 0 &&
-              (() => {
-                const serviceLevelData = new Map<
-                  number,
-                  { total: number; count: number }
-                >();
-                results.forEach((result, i) => {
-                  const price = selectedPrices.get(i);
-                  const serviceLevel = getSelectedServiceLevel(i);
-                  if (price && serviceLevel) {
-                    const quantity = result.customerItem.quantity || 1;
-                    const current = serviceLevelData.get(serviceLevel) || {
-                      total: 0,
-                      count: 0,
-                    };
-                    serviceLevelData.set(serviceLevel, {
-                      total: current.total + price * quantity, // Multiply price by quantity for total cost
-                      count: current.count + 1, // Count each item once, not by quantity
-                    });
+            {(() => {
+              const serviceLevelData = new Map<
+                number,
+                { total: number; count: number }
+              >();
+              
+              // Count regular priced items
+              results.forEach((result, i) => {
+                const price = selectedPrices.get(i);
+                const serviceLevel = getSelectedServiceLevel(i);
+                if (price && serviceLevel && !tmsLabs.has(i)) {
+                  const quantity = result.customerItem.quantity || 1;
+                  const current = serviceLevelData.get(serviceLevel) || {
+                    total: 0,
+                    count: 0,
+                  };
+                  serviceLevelData.set(serviceLevel, {
+                    total: current.total + price * quantity,
+                    count: current.count + 1,
+                  });
+                }
+              });
+
+              // Count TMS priced items
+              tmsLabs.forEach((rowIndex) => {
+                const tmsPrice = tmsPrices.get(rowIndex);
+                const serviceLevel = getSelectedServiceLevel(rowIndex);
+                if (tmsPrice && serviceLevel) {
+                  const quantity = results[rowIndex]?.customerItem.quantity || 1;
+                  const current = serviceLevelData.get(serviceLevel) || {
+                    total: 0,
+                    count: 0,
+                  };
+                  serviceLevelData.set(serviceLevel, {
+                    total: current.total + tmsPrice * quantity,
+                    count: current.count + 1,
+                  });
+                }
+              });
+
+              if (serviceLevelData.size === 0) return null;
+
+              const chartData = Array.from(serviceLevelData.entries())
+                .sort((a, b) => a[0] - b[0])
+                .map(([level, data]) => {
+                  // Use solid colors matching screenshot
+                  let color;
+                  if (level <= 2) {
+                    color = "#3b82f6"; // Blue
+                  } else if (level <= 4) {
+                    color = "#10b981"; // Green
+                  } else if (level <= 6) {
+                    color = "#f59e0b"; // Orange
+                  } else if (level <= 8) {
+                    color = "#8b5cf6"; // Purple
+                  } else if (level <= 10) {
+                    color = "#ef4444"; // Red
+                  } else {
+                    color = "#ec4899"; // Pink
                   }
-                });
 
-                if (serviceLevelData.size === 0) return null;
-
-                const chartData = Array.from(serviceLevelData.entries())
-                  .sort((a, b) => a[0] - b[0])
-                  .map(([level, data]) => ({
-                    label: `L${level}`,
+                  return {
+                    label: `Level ${level} - ${SERVICE_LEVEL_DESC[level] || ""}`,
                     value: data.total,
                     count: data.count,
-                    color: `linear-gradient(90deg, ${
-                      level <= 2
-                        ? "#60a5fa, #3b82f6"
-                        : level <= 4
-                        ? "#34d399, #10b981"
-                        : level <= 6
-                        ? "#fbbf24, #f59e0b"
-                        : level <= 8
-                        ? "#a78bfa, #8b5cf6"
-                        : level <= 10
-                        ? "#fb7185, #f43f5e"
-                        : "#fb923c, #ea580c"
-                    })`,
-                  }));
+                    color: color,
+                    maxLabel: `${money(data.total)} (${data.count} item${data.count !== 1 ? "s" : ""})`,
+                  };
+                });
 
-                return (
-                  <HorizontalBarChart
-                    title="💰 Cost by Service Level"
-                    data={chartData}
-                    darkMode={darkMode}
-                  />
-                );
-              })()}
+              return (
+                <HorizontalBarChart
+                  title="💰 Cost by Service Level"
+                  data={chartData}
+                  darkMode={darkMode}
+                />
+              );
+            })()}
           </div>
         </>
       )}
