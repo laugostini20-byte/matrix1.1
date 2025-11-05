@@ -1140,25 +1140,33 @@ export function UploadPage({
 
       {/* Main Results Table */}
       {results.length > 0 && (
-        <div className="glass-card overflow-hidden">
+        <div className="mt-6 glass-card overflow-hidden animate-fade-in">
           {/* Bulk Actions Bar */}
           {bulkSelectedRows.size > 0 && (
             <div
               className={`px-6 py-4 border-b flex items-center justify-between ${
                 darkMode
-                  ? "bg-blue-900/20 border-blue-700/50"
-                  : "bg-blue-50 border-blue-200"
+                  ? "bg-gradient-to-r from-blue-900/30 to-blue-800/30 border-blue-700/50"
+                  : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200"
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className="font-semibold text-blue-900">
-                  {bulkSelectedRows.size} item{bulkSelectedRows.size !== 1 ? "s" : ""} selected
+                <span
+                  className={`font-semibold ${
+                    darkMode ? "text-blue-200" : "text-blue-900"
+                  }`}
+                >
+                  ✓ {bulkSelectedRows.size} item{bulkSelectedRows.size !== 1 ? "s" : ""} selected
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={clearBulkSelection}
-                  className="px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors"
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 active:scale-95 ${
+                    darkMode
+                      ? "bg-gray-700 hover:bg-gray-600 text-white"
+                      : "bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
+                  }`}
                 >
                   Clear Selection
                 </button>
@@ -1168,7 +1176,11 @@ export function UploadPage({
                       applyBulkServiceLevel(Number(e.target.value));
                     }
                   }}
-                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white"
+                  className={`px-4 py-2 text-sm border rounded-lg transition-all duration-200 ${
+                    darkMode
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-white border-gray-300 text-gray-900"
+                  }`}
                   defaultValue=""
                 >
                   <option value="">Apply Service Level...</option>
@@ -1184,7 +1196,11 @@ export function UploadPage({
                       applyBulkLab(e.target.value);
                     }
                   }}
-                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white"
+                  className={`px-4 py-2 text-sm border rounded-lg transition-all duration-200 ${
+                    darkMode
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-white border-gray-300 text-gray-900"
+                  }`}
                   defaultValue=""
                 >
                   <option value="">Apply Lab...</option>
@@ -1202,7 +1218,11 @@ export function UploadPage({
                 </select>
                 <button
                   onClick={() => applyBulkBasePrice(true)}
-                  className="px-3 py-1.5 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 active:scale-95 ${
+                    darkMode
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : "bg-green-500 hover:bg-green-600 text-white"
+                  }`}
                 >
                   Apply Base Price
                 </button>
@@ -1211,8 +1231,8 @@ export function UploadPage({
           )}
 
           {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto scrollbar-modern">
+            <table className="w-full text-sm">
               <thead
                 className={`${
                   darkMode
@@ -1220,8 +1240,8 @@ export function UploadPage({
                     : "bg-gradient-to-r from-gray-50 to-gray-100"
                 }`}
               >
-                <tr>
-                  <th className="px-4 py-3 text-left">
+                <tr className={`text-left ${darkMode ? "text-gray-300" : "text-gray-600"} font-semibold uppercase text-xs tracking-wide`}>
+                  <th className="py-4 px-4 w-12">
                     <input
                       type="checkbox"
                       checked={
@@ -1235,54 +1255,18 @@ export function UploadPage({
                           clearBulkSelection();
                         }
                       }}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                     />
                   </th>
-                  <th
-                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
-                      darkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Item
-                  </th>
-                  <th
-                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
-                      darkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Match
-                  </th>
-                  <th
-                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
-                      darkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Service Level
-                  </th>
-                  <th
-                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
-                      darkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Pricing
-                  </th>
-                  <th
-                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
-                      darkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Lab
-                  </th>
-                  <th
-                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${
-                      darkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Actions
-                  </th>
+                  <th className="py-4 px-4">Item</th>
+                  <th className="py-4 px-4">Match</th>
+                  <th className="py-4 px-4">Service Level</th>
+                  <th className="py-4 px-4">Pricing</th>
+                  <th className="py-4 px-4">Lab</th>
+                  <th className="py-4 px-4">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-100">
                 {results.map((result, rowIndex) => {
                   const isExpanded = expandedRows.has(rowIndex);
                   const selectedMatch = getSelectedMatch(rowIndex);
@@ -1314,30 +1298,30 @@ export function UploadPage({
                         className={`${
                           isBulkSelected
                             ? darkMode
-                              ? "bg-blue-900/20"
-                              : "bg-blue-50"
+                              ? "bg-blue-900/30"
+                              : "bg-blue-50/50"
                             : darkMode
-                            ? "hover:bg-gray-800"
-                            : "hover:bg-gray-50"
-                        } transition-colors ${
+                            ? "hover:bg-gradient-to-r hover:from-blue-900/20 hover:to-transparent"
+                            : "hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-transparent"
+                        } transition-all duration-200 group cursor-pointer ${
                           isExcluded ? "opacity-50" : ""
                         }`}
                       >
                         {/* Checkbox */}
-                        <td className="px-4 py-4">
+                        <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
                           <input
                             type="checkbox"
                             checked={isBulkSelected}
                             onChange={() => toggleBulkSelect(rowIndex)}
-                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                           />
                         </td>
 
                         {/* Item Info */}
-                        <td className="px-4 py-4">
+                        <td className="py-4 px-4">
                           <div className="flex flex-col gap-1">
                             <div
-                              className={`font-semibold ${
+                              className={`font-semibold group-hover:text-blue-600 transition-colors ${
                                 darkMode ? "text-white" : "text-gray-900"
                               }`}
                             >
@@ -1346,7 +1330,7 @@ export function UploadPage({
                             </div>
                             <div
                               className={`text-xs ${
-                                darkMode ? "text-gray-400" : "text-gray-500"
+                                darkMode ? "text-gray-400" : "text-gray-600"
                               }`}
                             >
                               Row {result.customerItem.row} • Qty:{" "}
@@ -1356,7 +1340,7 @@ export function UploadPage({
                               )}
                             </div>
                             {result.matchedUnits.length === 0 && (
-                              <span className="text-xs text-red-600 font-medium">
+                              <span className="text-xs text-red-600 font-medium mt-1">
                                 ⚠️ No matches found
                               </span>
                             )}
@@ -1364,7 +1348,7 @@ export function UploadPage({
                         </td>
 
                         {/* Match Selection */}
-                        <td className="px-4 py-4">
+                        <td className="py-4 px-4">
                           {result.matchedUnits.length > 0 ? (
                             <select
                               value={selectedMatch?.id || ""}
@@ -1376,11 +1360,12 @@ export function UploadPage({
                                   onSelectMatch(rowIndex, unit);
                                 }
                               }}
-                              className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                              className={`w-full px-3 py-2 text-sm border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 ${
                                 darkMode
-                                  ? "bg-gray-800 border-gray-600 text-white"
-                                  : "bg-white border-gray-300"
+                                  ? "bg-gray-800/50 border-gray-600 text-white hover:bg-gray-800"
+                                  : "bg-white/80 border-gray-300 hover:bg-white"
                               }`}
+                              onClick={(e) => e.stopPropagation()}
                             >
                               <option value="">Select match...</option>
                               {result.matchedUnits.map((unit) => (
@@ -1392,8 +1377,11 @@ export function UploadPage({
                             </select>
                           ) : (
                             <button
-                              onClick={() => onManualMatch(rowIndex)}
-                              className="px-3 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onManualMatch(rowIndex);
+                              }}
+                              className="px-4 py-2 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 active:scale-95"
                             >
                               🔧 Manual Match
                             </button>
@@ -1401,7 +1389,7 @@ export function UploadPage({
                         </td>
 
                         {/* Service Level */}
-                        <td className="px-4 py-4">
+                        <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
                           {selectedMatch ? (
                             <ServiceLevelSelector
                               rowIndex={rowIndex}
@@ -1417,8 +1405,8 @@ export function UploadPage({
                             />
                           ) : (
                             <span
-                              className={`text-sm ${
-                                darkMode ? "text-gray-400" : "text-gray-500"
+                              className={`text-sm italic ${
+                                darkMode ? "text-gray-500" : "text-gray-400"
                               }`}
                             >
                               Select match first
@@ -1427,9 +1415,9 @@ export function UploadPage({
                         </td>
 
                         {/* Pricing */}
-                        <td className="px-4 py-4">
+                        <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
                           {selectedMatch && pricingRows.length > 0 ? (
-                            <div className="flex flex-col gap-1">
+                            <div className="flex flex-col gap-1.5 min-w-[140px]">
                               <input
                                 type="number"
                                 value={selectedPrice || ""}
@@ -1437,13 +1425,15 @@ export function UploadPage({
                                   const price = parseFloat(e.target.value);
                                   if (!isNaN(price) && price > 0) {
                                     updatePrice(rowIndex, price);
+                                  } else if (e.target.value === "") {
+                                    updatePrice(rowIndex, 0);
                                   }
                                 }}
-                                placeholder="Enter price"
-                                className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                                placeholder="$0.00"
+                                className={`w-full px-3 py-2 text-sm border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 ${
                                   darkMode
-                                    ? "bg-gray-800 border-gray-600 text-white"
-                                    : "bg-white border-gray-300"
+                                    ? "bg-gray-800/50 border-gray-600 text-white hover:bg-gray-800"
+                                    : "bg-white/80 border-gray-300 hover:bg-white"
                                 }`}
                               />
                               <button
@@ -1456,15 +1446,15 @@ export function UploadPage({
                                     updatePrice(rowIndex, pricingForLevel.base_price_usd);
                                   }
                                 }}
-                                className="text-xs text-blue-600 hover:text-blue-800 text-left"
+                                className="text-xs text-blue-600 hover:text-blue-800 font-medium text-left transition-colors"
                               >
                                 Use Base Price
                               </button>
                             </div>
                           ) : (
                             <span
-                              className={`text-sm ${
-                                darkMode ? "text-gray-400" : "text-gray-500"
+                              className={`text-sm italic ${
+                                darkMode ? "text-gray-500" : "text-gray-400"
                               }`}
                             >
                               —
@@ -1473,28 +1463,29 @@ export function UploadPage({
                         </td>
 
                         {/* Lab Selection */}
-                        <td className="px-4 py-4">
+                        <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
                           {selectedMatch && eligibleLabs.length > 0 ? (
                             <select
                               value={selectedLab || ""}
                               onChange={(e) => updateLab(rowIndex, e.target.value)}
-                              className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                              className={`w-full px-3 py-2 text-sm border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 ${
                                 darkMode
-                                  ? "bg-gray-800 border-gray-600 text-white"
-                                  : "bg-white border-gray-300"
+                                  ? "bg-gray-800/50 border-gray-600 text-white hover:bg-gray-800"
+                                  : "bg-white/80 border-gray-300 hover:bg-white"
                               }`}
                             >
                               <option value="">Select lab...</option>
                               {eligibleLabs.map((lab) => (
                                 <option key={lab.labName} value={lab.labName}>
                                   {lab.labName}
+                                  {lab.isAccredited ? " ✓" : ""}
                                 </option>
                               ))}
                             </select>
                           ) : (
                             <span
-                              className={`text-sm ${
-                                darkMode ? "text-gray-400" : "text-gray-500"
+                              className={`text-sm italic ${
+                                darkMode ? "text-gray-500" : "text-gray-400"
                               }`}
                             >
                               —
@@ -1503,23 +1494,33 @@ export function UploadPage({
                         </td>
 
                         {/* Actions */}
-                        <td className="px-4 py-4">
+                        <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
                             {selectedMatch && (
                               <button
-                                onClick={() => setModalRowIndex(rowIndex)}
-                                className="px-3 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setModalRowIndex(rowIndex);
+                                }}
+                                className="px-4 py-2 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 active:scale-95"
                                 title="View details"
                               >
                                 📋 Details
                               </button>
                             )}
                             <button
-                              onClick={() => onToggleRowExpansion(rowIndex)}
-                              className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleRowExpansion(rowIndex);
+                              }}
+                              className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 active:scale-95 ${
                                 isExpanded
-                                  ? "bg-gray-200 hover:bg-gray-300"
-                                  : "bg-gray-100 hover:bg-gray-200"
+                                  ? darkMode
+                                    ? "bg-gray-700 hover:bg-gray-600 text-white"
+                                    : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                                  : darkMode
+                                  ? "bg-gray-800 hover:bg-gray-700 text-white"
+                                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                               }`}
                               title={isExpanded ? "Collapse" : "Expand"}
                             >
@@ -1532,37 +1533,42 @@ export function UploadPage({
                       {/* Expanded Row Content */}
                       {isExpanded && selectedMatch && (
                         <tr>
-                          <td colSpan={7} className="px-4 py-4">
+                          <td colSpan={7} className="py-4 px-4">
                             <div
-                              className={`p-4 rounded-lg border ${
+                              className={`p-6 rounded-xl border shadow-sm ${
                                 darkMode
-                                  ? "bg-gray-800 border-gray-600"
-                                  : "bg-gray-50 border-gray-200"
+                                  ? "bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700"
+                                  : "bg-gradient-to-br from-gray-50 to-white border-gray-200"
                               }`}
                             >
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Pricing Info */}
                                 <div>
                                   <h4
-                                    className={`font-semibold mb-2 ${
-                                      darkMode ? "text-white" : "text-gray-900"
+                                    className={`font-semibold mb-3 text-sm uppercase tracking-wide ${
+                                      darkMode ? "text-gray-300" : "text-gray-600"
                                     }`}
                                   >
                                     Available Pricing
                                   </h4>
-                                  <div className="space-y-1">
+                                  <div className="space-y-2">
                                     {pricingRows
-                                      .slice(0, 5)
+                                      .slice(0, 6)
                                       .map((p) => (
                                         <div
                                           key={p.service_level}
-                                          className={`text-sm ${
+                                          className={`flex items-center justify-between p-2 rounded-lg ${
                                             darkMode
-                                              ? "text-gray-300"
-                                              : "text-gray-700"
+                                              ? "bg-gray-800/50 text-gray-300"
+                                              : "bg-white text-gray-700"
                                           }`}
                                         >
-                                          Level {p.service_level}: {money(p.base_price_usd)}
+                                          <span className="text-sm font-medium">
+                                            Level {p.service_level}
+                                          </span>
+                                          <span className="text-sm font-semibold text-blue-600">
+                                            {money(p.base_price_usd)}
+                                          </span>
                                         </div>
                                       ))}
                                   </div>
@@ -1571,24 +1577,30 @@ export function UploadPage({
                                 {/* Lab Info */}
                                 <div>
                                   <h4
-                                    className={`font-semibold mb-2 ${
-                                      darkMode ? "text-white" : "text-gray-900"
+                                    className={`font-semibold mb-3 text-sm uppercase tracking-wide ${
+                                      darkMode ? "text-gray-300" : "text-gray-600"
                                     }`}
                                   >
                                     Available Labs ({eligibleLabs.length})
                                   </h4>
-                                  <div className="space-y-1">
-                                    {eligibleLabs.slice(0, 5).map((lab) => (
+                                  <div className="space-y-2">
+                                    {eligibleLabs.slice(0, 6).map((lab) => (
                                       <div
                                         key={lab.labName}
-                                        className={`text-sm ${
+                                        className={`flex items-center justify-between p-2 rounded-lg ${
                                           darkMode
-                                            ? "text-gray-300"
-                                            : "text-gray-700"
+                                            ? "bg-gray-800/50 text-gray-300"
+                                            : "bg-white text-gray-700"
                                         }`}
                                       >
-                                        {lab.labName}
-                                        {lab.isAccredited && " ✓ Accredited"}
+                                        <span className="text-sm font-medium">
+                                          {lab.labName}
+                                        </span>
+                                        {lab.isAccredited && (
+                                          <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                                            ✓ Accredited
+                                          </span>
+                                        )}
                                       </div>
                                     ))}
                                   </div>
