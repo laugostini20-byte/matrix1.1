@@ -7,6 +7,7 @@ import {
   getEligibleLabsForUnit,
   supportsOnsiteCalibration,
   getStandardsForPN,
+  getLabCapabilitiesForUnit,
 } from "../../data/labs";
 import {
   money,
@@ -16,8 +17,19 @@ import {
   exportQuoteToPDF,
   exportQuoteToExcel,
   type OptimizationStrategy,
+  SERVICE_LEVEL_DESC,
+  ALL_LEVELS,
+  LABS,
+  LAB_CAPACITY,
+  getCapacityColor,
+  getCapacityTextColor,
+  clsx,
+  ttColor,
+  generatePricingRows,
+  getTMSVendorsForUnitHelper,
 } from "../";
 import { UnitDetailsModal, ManualSearchModal } from "../modals";
+import { ServiceLevelSelector } from "../../components/ServiceLevelSelector";
 import type { Unit, MatchResult } from "../types";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -357,9 +369,14 @@ export function UploadPage({
   onSelectMatch,
   getSelectedMatch,
   getSelectedServiceLevel,
+  getSelectedServiceLevels,
   getSelectedPrice,
   getSelectedLab,
   updateServiceLevel,
+  updateServiceLevels,
+  toggleServiceLevel,
+  toggleMultiSelectMode,
+  multiSelectMode,
   updatePrice,
   updateLab,
   preferredLabFilter,
@@ -396,6 +413,17 @@ export function UploadPage({
   onCloseManualSearch,
   onResetAll,
   tmsLabs,
+  tmsVendors,
+  tmsPrices,
+  tmsTurnTimes,
+  removeLabCapability,
+  addLabCapability,
+  getEligibleLabsForUnitWithOverrides,
+  openCapabilityModal,
+  capabilityModalOpen,
+  capabilityModalData,
+  closeCapabilityModal,
+  labCapabilityOverrides,
 }: {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -409,9 +437,14 @@ export function UploadPage({
   onSelectMatch: (rowIndex: number, unit: Unit) => void;
   getSelectedMatch: (rowIndex: number) => Unit | undefined;
   getSelectedServiceLevel: (rowIndex: number) => number;
+  getSelectedServiceLevels: (rowIndex: number) => Set<number>;
   getSelectedPrice: (rowIndex: number) => number | null;
   getSelectedLab: (rowIndex: number) => string;
   updateServiceLevel: (rowIndex: number, level: number) => void;
+  updateServiceLevels: (rowIndex: number, levels: Set<number>) => void;
+  toggleServiceLevel: (rowIndex: number, level: number) => void;
+  toggleMultiSelectMode: (rowIndex: number) => void;
+  multiSelectMode: Map<number, boolean>;
   updatePrice: (rowIndex: number, price: number) => void;
   updateLab: (rowIndex: number, lab: string) => void;
   preferredLabFilter: string;
@@ -448,6 +481,28 @@ export function UploadPage({
   onCloseManualSearch: () => void;
   onResetAll: () => void;
   tmsLabs: Set<number>;
+  tmsVendors: Map<number, string>;
+  tmsPrices: Map<number, number>;
+  tmsTurnTimes: Map<number, number>;
+  removeLabCapability: (labCode: string, partNumber: string) => void;
+  addLabCapability: (labCode: string, partNumber: string) => void;
+  getEligibleLabsForUnitWithOverrides: (requirements: {
+    partNumber: string;
+    requiredCapabilityTags: any[];
+  }) => any[];
+  openCapabilityModal: (
+    rowIndex: number,
+    partNumber: string,
+    requiredCapabilityTags: any[]
+  ) => void;
+  capabilityModalOpen: boolean;
+  capabilityModalData: {
+    rowIndex: number;
+    partNumber: string;
+    requiredCapabilityTags: any[];
+  } | null;
+  closeCapabilityModal: () => void;
+  labCapabilityOverrides: Map<string, Set<string>>;
 }) {
   // Memoized quote summary calculations to ensure reactivity
   const quoteSummary = useMemo(() => {
@@ -460,11 +515,12 @@ export function UploadPage({
     const configuredItems = Array.from(selectedMatches.keys()).filter((i) => {
       const hasPrice = selectedPrices.has(i);
       const hasLab = selectedLabs.has(i) && selectedLabs.get(i) !== "";
-      return hasPrice && hasLab;
+      const isTMS = tmsLabs.has(i);
+      return (hasPrice && hasLab) || isTMS;
     }).length;
 
     return { totalValue, configuredItems };
-  }, [selectedPrices, selectedMatches, selectedLabs]);
+  }, [selectedPrices, selectedMatches, selectedLabs, tmsLabs]);
 
   const exportResults = () => {
     if (results.length === 0) return;
