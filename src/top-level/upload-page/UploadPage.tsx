@@ -2,7 +2,7 @@
 // Upload Page Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import {
   getEligibleLabsForUnit,
   supportsOnsiteCalibration,
@@ -504,6 +504,24 @@ export function UploadPage({
   closeCapabilityModal: () => void;
   labCapabilityOverrides: Map<string, Set<string>>;
 }) {
+  // Track which row's gear dropdown is open
+  const [openGearDropdown, setOpenGearDropdown] = useState<number | null>(null);
+  const gearDropdownRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openGearDropdown !== null) {
+        const ref = gearDropdownRefs.current.get(openGearDropdown);
+        if (ref && !ref.contains(event.target as Node)) {
+          setOpenGearDropdown(null);
+        }
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openGearDropdown]);
+
   // Memoized quote summary calculations to ensure reactivity
   const quoteSummary = useMemo(() => {
     const totalValue = Array.from(selectedPrices.values()).reduce(
@@ -1540,7 +1558,7 @@ export function UploadPage({
 
                         {/* Row Number with Gear Icon */}
                         <td className="py-4 px-4">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 relative">
                             <span
                               className={`font-bold ${
                                 darkMode ? "text-white" : "text-gray-900"
@@ -1548,17 +1566,225 @@ export function UploadPage({
                             >
                               {result.customerItem.row || rowIndex + 1}
                             </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onToggleRowExpansion(rowIndex);
+                            <div
+                              ref={(el) => {
+                                if (el) {
+                                  gearDropdownRefs.current.set(rowIndex, el);
+                                } else {
+                                  gearDropdownRefs.current.delete(rowIndex);
+                                }
                               }}
-                              className="text-gray-400 hover:text-gray-600"
+                              className="relative"
                             >
-                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                              </svg>
-                            </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenGearDropdown(
+                                    openGearDropdown === rowIndex ? null : rowIndex
+                                  );
+                                }}
+                                className={`text-purple-400 hover:text-purple-600 transition-colors ${
+                                  openGearDropdown === rowIndex ? "text-purple-600" : ""
+                                }`}
+                              >
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </button>
+
+                              {/* Gear Dropdown Menu */}
+                              {openGearDropdown === rowIndex && (
+                                <div
+                                  className={`absolute left-0 mt-2 w-64 rounded-lg shadow-xl border z-50 ${
+                                    darkMode
+                                      ? "bg-gray-800 border-gray-600"
+                                      : "bg-white border-gray-200"
+                                  }`}
+                                >
+                                  <div className="p-2 space-y-1">
+                                    {/* Manual Lab Selection */}
+                                    <div>
+                                      <label
+                                        className={`block text-xs font-semibold mb-1 px-2 ${
+                                          darkMode ? "text-gray-300" : "text-gray-700"
+                                        }`}
+                                      >
+                                        Lab Location
+                                      </label>
+                                      {selectedMatch && eligibleLabs.length > 0 ? (
+                                        <select
+                                          value={selectedLab || ""}
+                                          onChange={(e) => {
+                                            updateLab(rowIndex, e.target.value);
+                                          }}
+                                          className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                                            darkMode
+                                              ? "bg-gray-700 border-gray-600 text-white"
+                                              : "bg-white border-gray-300 text-gray-900"
+                                          }`}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <option value="">Select lab location...</option>
+                                          {eligibleLabs.map((lab) => (
+                                            <option key={lab.labName} value={lab.labName}>
+                                              {lab.labName}
+                                              {lab.isAccredited ? " (Accredited)" : ""}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      ) : (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            onManualMatch(rowIndex);
+                                          }}
+                                          className={`w-full px-3 py-2 text-sm text-left rounded-lg transition-colors ${
+                                            darkMode
+                                              ? "bg-gray-700 hover:bg-gray-600 text-white"
+                                              : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                                          }`}
+                                        >
+                                          🔧 Manual Lab Selection
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    {/* Service Level Selection */}
+                                    <div>
+                                      <label
+                                        className={`block text-xs font-semibold mb-1 px-2 ${
+                                          darkMode ? "text-gray-300" : "text-gray-700"
+                                        }`}
+                                      >
+                                        Service Level
+                                      </label>
+                                      {selectedMatch ? (
+                                        <select
+                                          value={currentServiceLevel}
+                                          onChange={(e) => {
+                                            updateServiceLevel(
+                                              rowIndex,
+                                              Number(e.target.value)
+                                            );
+                                          }}
+                                          className={`w-full px-3 py-2 text-sm border rounded-lg ${
+                                            darkMode
+                                              ? "bg-gray-700 border-gray-600 text-white"
+                                              : "bg-white border-gray-300 text-gray-900"
+                                          }`}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          {ALL_LEVELS.map((level) => (
+                                            <option key={level} value={level}>
+                                              Level {level}: {SERVICE_LEVEL_DESC[level] || ""}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      ) : (
+                                        <div
+                                          className={`px-3 py-2 text-sm rounded-lg ${
+                                            darkMode
+                                              ? "bg-gray-700 text-gray-400"
+                                              : "bg-gray-100 text-gray-500"
+                                          }`}
+                                        >
+                                          Select match first
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Price Option */}
+                                    <div>
+                                      <label
+                                        className={`block text-xs font-semibold mb-1 px-2 ${
+                                          darkMode ? "text-gray-300" : "text-gray-700"
+                                        }`}
+                                      >
+                                        Price Option
+                                      </label>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (basePrice) {
+                                              updatePrice(rowIndex, basePrice);
+                                            }
+                                          }}
+                                          className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors ${
+                                            darkMode
+                                              ? "bg-blue-600 hover:bg-blue-700 text-white"
+                                              : "bg-blue-100 hover:bg-blue-200 text-blue-700"
+                                          }`}
+                                        >
+                                          Single
+                                        </button>
+                                        <select
+                                          value={
+                                            selectedPrice
+                                              ? selectedPrice.toString()
+                                              : ""
+                                          }
+                                          onChange={(e) => {
+                                            if (e.target.value) {
+                                              const price = parseFloat(e.target.value);
+                                              if (!isNaN(price) && price > 0) {
+                                                updatePrice(rowIndex, price);
+                                              }
+                                            }
+                                          }}
+                                          className={`flex-1 px-3 py-2 text-sm border rounded-lg ${
+                                            darkMode
+                                              ? "bg-gray-700 border-gray-600 text-white"
+                                              : "bg-white border-gray-300 text-gray-900"
+                                          }`}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <option value="">Select price option...</option>
+                                          {pricingRows.map((p) => (
+                                            <option key={p.service_level} value={p.base_price_usd}>
+                                              Level {p.service_level}: {money(p.base_price_usd)}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      </div>
+                                    </div>
+
+                                    {/* Add or Remove Capabilities */}
+                                    {selectedMatch && (
+                                      <div className="pt-2 border-t border-gray-300 dark:border-gray-600">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            openCapabilityModal(
+                                              rowIndex,
+                                              selectedMatch.part_number,
+                                              selectedMatch.requiredCapabilityTags
+                                            );
+                                            setOpenGearDropdown(null);
+                                          }}
+                                          className={`w-full px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                                            darkMode
+                                              ? "bg-green-600 hover:bg-green-700 text-white"
+                                              : "bg-green-500 hover:bg-green-600 text-white"
+                                          }`}
+                                        >
+                                          <span>✓</span>
+                                          <span>Add or Remove Capabilities</span>
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </td>
 
