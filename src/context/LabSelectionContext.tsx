@@ -8,17 +8,17 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 interface LabSelectionContextType {
   // Service level selections
   selectedServiceLevels: Map<number, number>;
-  setSelectedServiceLevels: (levels: Map<number, number>) => void;
+  setSelectedServiceLevels: React.Dispatch<React.SetStateAction<Map<number, number>>>;
   selectedServiceLevelSets: Map<number, Set<number>>;
-  setSelectedServiceLevelSets: (sets: Map<number, Set<number>>) => void;
+  setSelectedServiceLevelSets: React.Dispatch<React.SetStateAction<Map<number, Set<number>>>>;
   multiSelectMode: Map<number, boolean>;
-  setMultiSelectMode: (mode: Map<number, boolean>) => void;
+  setMultiSelectMode: React.Dispatch<React.SetStateAction<Map<number, boolean>>>;
   
   // Lab and pricing selections
   selectedPrices: Map<number, number>;
-  setSelectedPrices: (prices: Map<number, number>) => void;
+  setSelectedPrices: React.Dispatch<React.SetStateAction<Map<number, number>>>;
   selectedLabs: Map<number, string>;
-  setSelectedLabs: (labs: Map<number, string>) => void;
+  setSelectedLabs: React.Dispatch<React.SetStateAction<Map<number, string>>>;
   
   // Lab preferences (persisted)
   preferredLabFilter: string;
@@ -30,21 +30,21 @@ interface LabSelectionContextType {
   preferredLab: string;
   setPreferredLab: (lab: string) => void;
   transferLabs: Set<number>;
-  setTransferLabs: (labs: Set<number>) => void;
+  setTransferLabs: React.Dispatch<React.SetStateAction<Set<number>>>;
   
   // TMS (Third-Party Vendor Service) state
   tmsLabs: Set<number>;
-  setTmsLabs: (labs: Set<number>) => void;
+  setTmsLabs: React.Dispatch<React.SetStateAction<Set<number>>>;
   tmsVendors: Map<number, string>;
-  setTmsVendors: (vendors: Map<number, string>) => void;
+  setTmsVendors: React.Dispatch<React.SetStateAction<Map<number, string>>>;
   tmsPrices: Map<number, number>;
-  setTmsPrices: (prices: Map<number, number>) => void;
+  setTmsPrices: React.Dispatch<React.SetStateAction<Map<number, number>>>;
   tmsTurnTimes: Map<number, number>;
-  setTmsTurnTimes: (times: Map<number, number>) => void;
+  setTmsTurnTimes: React.Dispatch<React.SetStateAction<Map<number, number>>>;
   
   // Lab capability overrides
   labCapabilityOverrides: Map<string, Set<string>>;
-  setLabCapabilityOverrides: (overrides: Map<string, Set<string>>) => void;
+  setLabCapabilityOverrides: React.Dispatch<React.SetStateAction<Map<string, Set<string>>>>;
   
   // Modal state for lab capability management
   capabilityModalOpen: boolean;

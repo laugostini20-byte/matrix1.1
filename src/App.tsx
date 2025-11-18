@@ -13,17 +13,13 @@ import { CopyButton } from "./components/CopyButton";
 import { ComparisonModal } from "./components/modals/ComparisonModal";
 import { serializeCaps, serializePricing } from "./utils/serialization";
 import { buildServiceLevelText, exportServiceLevelText, exportAllUnitsData } from "./utils/export";
-import { calculateLabRecommendation, getRecommendationColors, type LabRecommendation } from "./business-logic/lab-recommendations";
-import { calculateCoverageStats } from "./business-logic/coverage-stats";
-import { useLocalStorage } from "./hooks/useLocalStorage";
+import { calculateLabRecommendation, getRecommendationColors } from "./business-logic/lab-recommendations";
 import { useDebounce } from "./hooks/useDebounce";
 import { AppStateProvider, useAppState } from "./context/AppStateContext";
 import { SearchProvider, useSearch } from "./context/SearchContext";
 import { LabSelectionProvider, useLabSelection } from "./context/LabSelectionContext";
 import type {
   Unit,
-  LabCapabilityForUnit,
-  PricingRow,
   CustomerItem,
   MatchResult,
   LabLocation,
@@ -372,14 +368,14 @@ function AppContent() {
                 );
 
                 // Auto-assign TMS vendor and settings
-                setSelectedMatches((prev) =>
+                setSelectedMatches((prev: Map<number, Unit>) =>
                   new Map(prev).set(index, result.bestMatch!)
                 );
-                setSelectedServiceLevels((prev) => new Map(prev).set(index, 1));
-                setSelectedPrices((prev) =>
+                setSelectedServiceLevels((prev: Map<number, number>) => new Map(prev).set(index, 1));
+                setSelectedPrices((prev: Map<number, number>) =>
                   new Map(prev).set(index, preferredVendor.negotiated_price_usd)
                 );
-                setSelectedLabs((prev) =>
+                setSelectedLabs((prev: Map<number, string>) =>
                   new Map(prev).set(
                     index,
                     `TMS - ${preferredVendor.vendor_name}`
@@ -487,7 +483,7 @@ function AppContent() {
 
   // Unmatched items handlers
   const handleExcludeItem = (index: number) => {
-    setExcludedItems((prev) => {
+    setExcludedItems((prev: Set<number>) => {
       const newSet = new Set(prev);
       newSet.add(index);
       return newSet;
@@ -517,7 +513,7 @@ function AppContent() {
     window.location.href = `mailto:research@transcat.com?subject=${subject}&body=${body}`;
 
     // Mark as sent to research
-    setResearchItems((prev) => {
+    setResearchItems((prev: Set<number>) => {
       const newSet = new Set(prev);
       newSet.add(index);
       return newSet;
@@ -621,7 +617,7 @@ function AppContent() {
 
   const updateServiceLevel = (rowIndex: number, level: number) => {
     // Switch to single-select mode
-    setMultiSelectMode((prev) => {
+    setMultiSelectMode((prev: Map<number, boolean>) => {
       const newMode = new Map(prev);
       newMode.set(rowIndex, false);
       return newMode;
@@ -632,7 +628,7 @@ function AppContent() {
     setSelectedServiceLevels(newSelected);
 
     // Clear multi-select data
-    setSelectedServiceLevelSets((prev) => {
+    setSelectedServiceLevelSets((prev: Map<number, Set<number>>) => {
       const newSets = new Map(prev);
       newSets.delete(rowIndex);
       return newSets;
@@ -647,20 +643,20 @@ function AppContent() {
   // New multi-select service level functions
   const updateServiceLevels = (rowIndex: number, levels: Set<number>) => {
     // Switch to multi-select mode
-    setMultiSelectMode((prev) => {
+    setMultiSelectMode((prev: Map<number, boolean>) => {
       const newMode = new Map(prev);
       newMode.set(rowIndex, true);
       return newMode;
     });
 
-    setSelectedServiceLevelSets((prev) => {
+    setSelectedServiceLevelSets((prev: Map<number, Set<number>>) => {
       const newSets = new Map(prev);
       newSets.set(rowIndex, levels);
       return newSets;
     });
 
     // Clear single-select data
-    setSelectedServiceLevels((prev) => {
+    setSelectedServiceLevels((prev: Map<number, number>) => {
       const newSelected = new Map(prev);
       newSelected.delete(rowIndex);
       return newSelected;
@@ -932,7 +928,7 @@ function AppContent() {
     setMultiSelectMode(newMultiSelectMode);
 
     // Clear multi-select data for bulk-selected rows
-    setSelectedServiceLevelSets((prev) => {
+    setSelectedServiceLevelSets((prev: Map<number, Set<number>>) => {
       const newSets = new Map(prev);
       bulkSelectedRows.forEach((rowIndex) => {
         newSets.delete(rowIndex);
@@ -1106,7 +1102,7 @@ function AppContent() {
             </div>
             <div className="flex items-center gap-3 animate-slide-in-right">
               <button
-                onClick={() => setDarkMode((v) => !v)}
+                onClick={() => setDarkMode((v: boolean) => !v)}
                 className={`w-10 h-10 flex items-center justify-center rounded-full border hover:shadow-md transition-all duration-200 active:scale-95 ${
                   darkMode
                     ? "bg-[#2c2c2e] border-white/10 hover:bg-[#3c3c3e]"
@@ -1117,7 +1113,7 @@ function AppContent() {
                 <span className="text-lg">{darkMode ? "☀️" : "🌙"}</span>
               </button>
               <button
-                onClick={() => setShowDiag((v) => !v)}
+                onClick={() => setShowDiag((v: boolean) => !v)}
                 className={`px-4 py-2 text-xs font-medium rounded-full border hover:shadow-md transition-all duration-200 active:scale-95 ${
                   darkMode
                     ? "bg-[#2c2c2e] border-white/10 text-gray-300 hover:bg-[#3c3c3e] hover:text-white"

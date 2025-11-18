@@ -17,7 +17,7 @@ interface AppStateContextType {
   
   // Dark mode
   darkMode: boolean;
-  setDarkMode: (darkMode: boolean) => void;
+  setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
   
   // Coverage statistics
   coverageStats: CoverageStats | null;
@@ -25,7 +25,7 @@ interface AppStateContextType {
   
   // Diagnostics
   showDiag: boolean;
-  setShowDiag: (show: boolean) => void;
+  setShowDiag: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AppStateContext = createContext<AppStateContextType | undefined>(undefined);
