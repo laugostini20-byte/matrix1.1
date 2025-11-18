@@ -357,7 +357,6 @@ export function UploadPage({
   onSelectMatch,
   getSelectedMatch,
   getSelectedServiceLevel,
-  getSelectedServiceLevels,
   getSelectedPrice,
   getSelectedLab,
   updateServiceLevel,
@@ -410,7 +409,6 @@ export function UploadPage({
   onSelectMatch: (rowIndex: number, unit: Unit) => void;
   getSelectedMatch: (rowIndex: number) => Unit | undefined;
   getSelectedServiceLevel: (rowIndex: number) => number;
-  getSelectedServiceLevels: (rowIndex: number) => Set<number>;
   getSelectedPrice: (rowIndex: number) => number | null;
   getSelectedLab: (rowIndex: number) => string;
   updateServiceLevel: (rowIndex: number, level: number) => void;
