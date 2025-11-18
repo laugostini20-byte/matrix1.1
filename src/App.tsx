@@ -1,8 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { UNITS } from "./data/units";
 import {
-  LABS,
-  getStandardsForPN,
   supportsOnsiteCalibration,
   getLabCapabilitiesForUnit,
   getEligibleLabsForUnit,
@@ -30,18 +28,12 @@ import {
   money,
   ttColor,
   searchUnits,
-  DonutChart,
   HorizontalBarChart,
   parseCustomerList,
-  getMatchQuality,
   createMatchResult,
-  calculateQuoteSummary,
-  exportQuoteToExcel,
-  exportQuoteToPDF,
   calculateServiceLevelPrice,
   generatePricingRows,
   normalizePricing,
-  generateRecommendations,
   optimizeSelections,
   isTMSRequired,
   getTMSVendorsForUnitHelper,
