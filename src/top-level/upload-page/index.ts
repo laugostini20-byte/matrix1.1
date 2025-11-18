@@ -1,11 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Upload Page Module Exports
+// Upload Page Components Export
 // ─────────────────────────────────────────────────────────────────────────────
 
-export { useUploadHandlers } from "./useUploadHandlers";
-export { UploadValidation } from "./UploadValidation";
-export { UnmatchedItemsSection } from "./UnmatchedItemsSection";
-export { QuoteSummaryDashboard } from "./QuoteSummaryDashboard";
-export { BulkActionsPanel } from "./BulkActionsPanel";
-export { OptimizationPanel } from "./OptimizationPanel";
 export { UploadPage } from "./UploadPage";
