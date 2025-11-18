@@ -15,6 +15,11 @@ import { serializeCaps, serializePricing } from "./utils/serialization";
 import { buildServiceLevelText, exportServiceLevelText, exportAllUnitsData } from "./utils/export";
 import { calculateLabRecommendation, getRecommendationColors, type LabRecommendation } from "./business-logic/lab-recommendations";
 import { calculateCoverageStats } from "./business-logic/coverage-stats";
+import { useLocalStorage } from "./hooks/useLocalStorage";
+import { useDebounce } from "./hooks/useDebounce";
+import { AppStateProvider, useAppState } from "./context/AppStateContext";
+import { SearchProvider, useSearch } from "./context/SearchContext";
+import { LabSelectionProvider, useLabSelection } from "./context/LabSelectionContext";
 import type {
   Unit,
   LabCapabilityForUnit,
@@ -167,39 +172,48 @@ function BarChart({
 }
 */
 
-export default function App() {
-  const [coverageStats, setCoverageStats] = useState<ReturnType<
-    typeof calculateCoverageStats
-  > | null>(null);
-
-  // Calculate coverage on mount
-  useEffect(() => {
-    const stats = calculateCoverageStats();
-    setCoverageStats(stats);
-    console.log("📊 Standards Coverage Analysis:", stats);
-  }, []);
-
-  // Navigation state
-  const [currentPage, setCurrentPage] = useState<
-    "search" | "details" | "upload"
-  >("search");
-
-  // Page A search bars
-  const [partQ, setPartQ] = useState("");
-  const [mfrQ, setMfrQ] = useState("");
-  const [modelQ, setModelQ] = useState("");
-  const [descQ, setDescQ] = useState("");
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [priceMin, setPriceMin] = useState("");
-  const [priceMax, setPriceMax] = useState("");
-  const [hasOnsiteFilter, setHasOnsiteFilter] = useState<string>("all");
-  const [compareMode, setCompareMode] = useState(false);
-  const [selectedForCompare, setSelectedForCompare] = useState<Set<string>>(
-    new Set()
-  );
-  const [showCompareModal, setShowCompareModal] = useState(false);
-  // Selected unit (Page B)
-  const [selected, setSelected] = useState<Unit | null>(null);
+function AppContent() {
+  // Get global app state from context
+  const { currentPage, setCurrentPage, darkMode, setDarkMode, coverageStats, showDiag, setShowDiag } = useAppState();
+  
+  // Get search state from context
+  const {
+    partQ, setPartQ,
+    mfrQ, setMfrQ,
+    modelQ, setModelQ,
+    descQ, setDescQ,
+    showAdvancedFilters, setShowAdvancedFilters,
+    priceMin, setPriceMin,
+    priceMax, setPriceMax,
+    hasOnsiteFilter, setHasOnsiteFilter,
+    compareMode, setCompareMode,
+    selectedForCompare, setSelectedForCompare,
+    showCompareModal, setShowCompareModal,
+    selected, setSelected,
+    capType, setCapType,
+    accred, setAccred,
+    svclevel, setSvclevel,
+  } = useSearch();
+  
+  // Get lab selection state from context
+  const {
+    selectedServiceLevels, setSelectedServiceLevels,
+    selectedServiceLevelSets, setSelectedServiceLevelSets,
+    multiSelectMode, setMultiSelectMode,
+    selectedPrices, setSelectedPrices,
+    selectedLabs, setSelectedLabs,
+    preferredLabFilter, setPreferredLabFilter,
+    zipCodeFilter, setZipCodeFilter,
+    preferredLab, setPreferredLab,
+    transferLabs, setTransferLabs,
+    tmsLabs, setTmsLabs,
+    tmsVendors, setTmsVendors,
+    tmsPrices, setTmsPrices,
+    tmsTurnTimes, setTmsTurnTimes,
+    labCapabilityOverrides, setLabCapabilityOverrides,
+    capabilityModalOpen, setCapabilityModalOpen,
+    capabilityModalData, setCapabilityModalData,
+  } = useLabSelection();
 
   // Page C upload state
   const [uploadResults, setUploadResults] = useState<MatchResult[]>([]);
@@ -210,54 +224,7 @@ export default function App() {
   const [selectedMatches, setSelectedMatches] = useState<Map<number, Unit>>(
     new Map()
   );
-  const [selectedServiceLevels, setSelectedServiceLevels] = useState<
-    Map<number, number>
-  >(new Map());
-  // New multi-select service level support
-  const [selectedServiceLevelSets, setSelectedServiceLevelSets] = useState<
-    Map<number, Set<number>>
-  >(new Map());
-  const [multiSelectMode, setMultiSelectMode] = useState<Map<number, boolean>>(
-    new Map()
-  );
-  const [selectedPrices, setSelectedPrices] = useState<Map<number, number>>(
-    new Map()
-  );
-  const [selectedLabs, setSelectedLabs] = useState<Map<number, string>>(
-    new Map()
-  );
-
-  // Track preferred lab and transfer labs for highlighting
-  const [preferredLab, setPreferredLab] = useState<string>("");
-  const [transferLabs, setTransferLabs] = useState<Set<number>>(new Set());
-
-  // TMS (Third-Party Vendor Service) state
-  const [tmsLabs, setTmsLabs] = useState<Set<number>>(new Set());
-  const [tmsVendors, setTmsVendors] = useState<Map<number, string>>(new Map());
-  const [tmsPrices, setTmsPrices] = useState<Map<number, number>>(new Map());
-  const [tmsTurnTimes, setTmsTurnTimes] = useState<Map<number, number>>(
-    new Map()
-  );
-
-  // Track lab capability overrides (labCode -> Set of partNumbers they can/cannot do)
-  const [labCapabilityOverrides, setLabCapabilityOverrides] = useState<
-    Map<string, Set<string>>
-  >(new Map());
-
-  // Modal state for lab capability management
-  const [capabilityModalOpen, setCapabilityModalOpen] = useState(false);
-  const [capabilityModalData, setCapabilityModalData] = useState<{
-    rowIndex: number;
-    partNumber: string;
-    requiredCapabilityTags: any[];
-  } | null>(null);
-
-  const [preferredLabFilter, setPreferredLabFilter] = useState<string>(() => {
-    return localStorage.getItem("preferredLab") || "";
-  });
-  const [zipCodeFilter, setZipCodeFilter] = useState<string>(() => {
-    return localStorage.getItem("zipCode") || "";
-  });
+  
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [modalRowIndex, setModalRowIndex] = useState<number | null>(null);
 
@@ -273,50 +240,11 @@ export default function App() {
     null
   );
 
-  // Optional filters (used inside DetailView)
-  const [capType, setCapType] = useState<string>("All");
-  const [accred, setAccred] = useState<string>("All");
-  const [svclevel, setSvclevel] = useState<Set<number>>(new Set());
-  const [showDiag, setShowDiag] = useState<boolean>(false);
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    return localStorage.getItem("darkMode") === "true";
-  });
-
-  // Debounce Page A inputs
-  const [dPart, setDPart] = useState(partQ);
-  const [dMfr, setDMfr] = useState(mfrQ);
-  const [dModel, setDModel] = useState(modelQ);
-  const [dDesc, setDDesc] = useState(descQ);
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setDPart(partQ);
-      setDMfr(mfrQ);
-      setDModel(modelQ);
-      setDDesc(descQ);
-    }, 200);
-    return () => clearTimeout(t);
-  }, [partQ, mfrQ, modelQ, descQ]);
-
-  // Save preferences to localStorage
-  useEffect(() => {
-    localStorage.setItem("preferredLab", preferredLabFilter);
-  }, [preferredLabFilter]);
-
-  useEffect(() => {
-    localStorage.setItem("zipCode", zipCodeFilter);
-  }, [zipCodeFilter]);
-
-  // Dark mode effect - apply to body/html and persist
-  useEffect(() => {
-    localStorage.setItem("darkMode", String(darkMode));
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      document.body.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      document.body.classList.remove("dark");
-    }
-  }, [darkMode]);
+  // Debounce search inputs
+  const dPart = useDebounce(partQ, 200);
+  const dMfr = useDebounce(mfrQ, 200);
+  const dModel = useDebounce(modelQ, 200);
+  const dDesc = useDebounce(descQ, 200);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -6670,5 +6598,21 @@ function UploadPage({
         </div>
       )}
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main App Component - Wraps AppContent with Context Providers
+// ─────────────────────────────────────────────────────────────────────────────
+
+export default function App() {
+  return (
+    <AppStateProvider>
+      <SearchProvider>
+        <LabSelectionProvider>
+          <AppContent />
+        </LabSelectionProvider>
+      </SearchProvider>
+    </AppStateProvider>
   );
 }
