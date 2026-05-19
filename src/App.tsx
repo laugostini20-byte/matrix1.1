@@ -1982,6 +1982,10 @@ function DetailView({
     [unit]
   );
 
+  const sortedCaps = activeSort
+    ? sortLabsByDistance(caps, activeSort.coords)
+    : caps.map((c) => ({ ...c, distanceMi: null as number | null }));
+
   return (
     <div className="glass-card p-6 animate-fade-in">
       {/* Modern Header */}
@@ -2242,7 +2246,7 @@ function DetailView({
               </tr>
             </thead>
             <tbody>
-              {caps.map((c, i) => {
+              {sortedCaps.map((c, i) => {
                 const isExpanded = expandedLabs.has(c.labCode);
                 return (
                   <React.Fragment key={i}>
@@ -2259,6 +2263,11 @@ function DetailView({
                       </td>
                       <td className="py-2 px-3 whitespace-nowrap font-medium">
                         {c.labName}
+                        {c.distanceMi != null && c.distanceMi !== Infinity && (
+                          <span className="ml-1 text-xs text-gray-500 font-normal">
+                            ({c.distanceMi} mi)
+                          </span>
+                        )}
                       </td>
                       <td className="py-2 px-3 whitespace-nowrap">
                         {c.isAccredited ? (
