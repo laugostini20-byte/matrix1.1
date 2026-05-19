@@ -2,12 +2,9 @@
 // Upload Page Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-import React, { useMemo } from "react";
-import {
-  getEligibleLabsForUnit,
-  supportsOnsiteCalibration,
-  getStandardsForPN,
-} from "../../data/labs";
+import { useMemo } from "react";
+import type React from "react";
+import { getEligibleLabsForUnit } from "../../data/labs";
 import {
   money,
   DonutChart,
@@ -230,7 +227,7 @@ function UnmatchedItemsSection({
 // ─────────────────────────────────────────────────────────────────────────────
 function QuoteSummaryDashboard({
   summary,
-  darkMode,
+  darkMode: _darkMode,
   onExportPDF,
   onExportExcel,
 }: {
@@ -351,37 +348,37 @@ export function UploadPage({
   results,
   errors,
   warnings,
-  expandedRows,
+  expandedRows: _expandedRows,
   selectedMatches,
-  onToggleRowExpansion,
-  onSelectMatch,
+  onToggleRowExpansion: _onToggleRowExpansion,
+  onSelectMatch: _onSelectMatch,
   getSelectedMatch,
   getSelectedServiceLevel,
-  getSelectedPrice,
+  getSelectedPrice: _getSelectedPrice,
   getSelectedLab,
-  updateServiceLevel,
-  updatePrice,
-  updateLab,
-  preferredLabFilter,
-  setPreferredLabFilter,
-  zipCodeFilter,
-  setZipCodeFilter,
-  autoSelectPrioritizedLabs,
-  refreshLabPriorities,
+  updateServiceLevel: _updateServiceLevel,
+  updatePrice: _updatePrice,
+  updateLab: _updateLab,
+  preferredLabFilter: _preferredLabFilter,
+  setPreferredLabFilter: _setPreferredLabFilter,
+  zipCodeFilter: _zipCodeFilter,
+  setZipCodeFilter: _setZipCodeFilter,
+  autoSelectPrioritizedLabs: _autoSelectPrioritizedLabs,
+  refreshLabPriorities: _refreshLabPriorities,
   modalRowIndex,
   setModalRowIndex,
-  bulkSelectedRows,
-  toggleBulkSelect,
-  selectAllRows,
-  clearBulkSelection,
-  applyBulkLab,
-  applyBulkServiceLevel,
-  applyBulkBasePrice,
-  handleOptimize,
-  saveQuoteSession,
-  loadQuoteSession,
+  bulkSelectedRows: _bulkSelectedRows,
+  toggleBulkSelect: _toggleBulkSelect,
+  selectAllRows: _selectAllRows,
+  clearBulkSelection: _clearBulkSelection,
+  applyBulkLab: _applyBulkLab,
+  applyBulkServiceLevel: _applyBulkServiceLevel,
+  applyBulkBasePrice: _applyBulkBasePrice,
+  handleOptimize: _handleOptimize,
+  saveQuoteSession: _saveQuoteSession,
+  loadQuoteSession: _loadQuoteSession,
   selectedPrices,
-  selectedServiceLevels,
+  selectedServiceLevels: _selectedServiceLevels,
   selectedLabs,
   preferredLab,
   transferLabs,
@@ -465,121 +462,6 @@ export function UploadPage({
 
     return { totalValue, configuredItems };
   }, [selectedPrices, selectedMatches, selectedLabs]);
-
-  const exportResults = () => {
-    if (results.length === 0) return;
-
-    // Include ALL items - we want excluded items too for "mark for review" functionality
-    const filteredResults = results;
-
-    const headers = [
-      "Row",
-      "Manufacturer",
-      "Model",
-      "Selected Service Level",
-      "Selected Price",
-      "Selected Lab",
-      "Service Type",
-      "Quantity",
-      "Notes",
-      "Best Match PN",
-      "Standards Count",
-      "Supports Onsite",
-      "Price Range",
-      "Turn Time Range",
-      "All Available Labs",
-      "Has Accredited",
-      "Has Limited",
-    ];
-    const rows = filteredResults.map((result, i) => {
-      const priceRange =
-        result.minPrice && result.maxPrice
-          ? `${money(result.minPrice)} - ${money(result.maxPrice)}`
-          : "TBD";
-
-      const turnTimeRange =
-        result.minTurnTime && result.maxTurnTime
-          ? `${result.minTurnTime}-${result.maxTurnTime} days`
-          : "TBD";
-
-      const selectedMatch = getSelectedMatch(i);
-      const standardsCount = selectedMatch
-        ? getStandardsForPN(selectedMatch.part_number).length
-        : 0;
-      const supportsOnsite = selectedMatch
-        ? supportsOnsiteCalibration(selectedMatch.part_number)
-        : false;
-
-      // Determine service type
-      const selectedUnit = selectedMatches.get(i);
-      const selectedPrice = selectedPrices.get(i);
-      const selectedLab = selectedLabs.get(i);
-      const selectedServiceLevel = getSelectedServiceLevel(i);
-
-      const isConfigured =
-        selectedUnit &&
-        selectedPrice &&
-        selectedLab &&
-        selectedServiceLevels.has(i);
-      let serviceType = "";
-
-      if (excludedItems.has(i)) {
-        serviceType = "Marked for Review";
-      } else if (tmsLabs.has(i)) {
-        serviceType = "TMS";
-      } else if (!isConfigured) {
-        serviceType = "Needs More Info";
-      } else if (transferLabs && transferLabs.has(i)) {
-        serviceType = "Transfer";
-      } else if (preferredLab && selectedLab === preferredLab) {
-        if (supportsOnsiteCalibration(selectedUnit.part_number)) {
-          serviceType = "Onsite/Depot Capable";
-        } else {
-          serviceType = "Depot Only";
-        }
-      } else if (preferredLab && selectedLab !== preferredLab) {
-        serviceType = "Depot Only";
-      } else {
-        if (supportsOnsiteCalibration(selectedUnit.part_number)) {
-          serviceType = "Onsite/Depot Capable";
-        } else {
-          serviceType = "Depot Only";
-        }
-      }
-
-      return [
-        String(result.customerItem.row),
-        result.customerItem.manufacturer,
-        result.customerItem.model,
-        String(getSelectedServiceLevel(i)),
-        getSelectedPrice(i) ? money(getSelectedPrice(i)!) : "",
-        getSelectedLab(i) || "",
-        serviceType,
-        String(result.customerItem.quantity || 1),
-        result.customerItem.notes || "",
-        selectedMatch?.part_number || "No match",
-        String(standardsCount),
-        supportsOnsite ? "Yes" : "No",
-        priceRange,
-        turnTimeRange,
-        result.labs.join(", "),
-        result.hasAccredited ? "Yes" : "No",
-        result.hasLimited ? "Yes" : "No",
-      ].join("\t");
-    });
-
-    const content = [headers.join("\t"), ...rows].join("\n");
-
-    const blob = new Blob([content], { type: "text/tab-separated-values" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `calibration-matches-${
-      new Date().toISOString().split("T")[0]
-    }.tsv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   // Calculate comprehensive quote summary - exclude excluded items and include manually matched items
   const quoteSummaryData = useMemo(() => {

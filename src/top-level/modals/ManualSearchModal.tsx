@@ -2,7 +2,7 @@
 // Manual Search Modal for Unmatched Items
 // ─────────────────────────────────────────────────────────────────────────────
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { searchUnits } from "../utils";
 import { money } from "../utils";
 import type { Unit, CustomerItem } from "../types";

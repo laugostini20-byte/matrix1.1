@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SERVICE_LEVEL_DESC, ALL_LEVELS } from "../top-level";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -9,7 +9,7 @@ export function ServiceLevelSelector({
   rowIndex,
   selectedLevels,
   onUpdateServiceLevel,
-  onUpdateServiceLevels,
+  onUpdateServiceLevels: _onUpdateServiceLevels,
   onToggleServiceLevel,
   onToggleMultiSelectMode,
   isMultiSelect,

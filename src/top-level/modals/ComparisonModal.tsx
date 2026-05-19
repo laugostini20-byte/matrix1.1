@@ -2,7 +2,6 @@
 // Comparison Modal Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-import React from "react";
 import {
   getEligibleLabsForUnit,
   supportsOnsiteCalibration,

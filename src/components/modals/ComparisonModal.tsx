@@ -1,4 +1,3 @@
-import React from "react";
 import type { Unit } from "../../top-level";
 import { getEligibleLabsForUnit, supportsOnsiteCalibration } from "../../data/labs";
 import { money } from "../../top-level";
