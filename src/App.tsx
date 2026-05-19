@@ -54,6 +54,11 @@ import {
   getTMSVendorsForUnitHelper,
   selectPreferredTMSVendor,
 } from "./top-level";
+import {
+  getCoordsForPostalCode,
+  isValidPostalFormat,
+  sortLabsByDistance,
+} from "./business-logic/zip-distance";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main App Component
@@ -1871,6 +1876,13 @@ function DetailView({
   darkMode: boolean;
 }) {
   const [expandedLabs, setExpandedLabs] = useState<Set<string>>(new Set());
+  const [zipPanelOpen, setZipPanelOpen] = useState<boolean>(false);
+  const [zipInput, setZipInput] = useState<string>("");
+  const [activeSort, setActiveSort] = useState<{
+    coords: [number, number];
+    label: string;
+  } | null>(null);
+  const [zipError, setZipError] = useState<string | null>(null);
 
   // Get lab capabilities using the new resolver
   const labCaps = useMemo(
@@ -2109,6 +2121,17 @@ function DetailView({
               Lab Capabilities
             </h3>
           </div>
+          <button
+            type="button"
+            onClick={() => setZipPanelOpen((open) => !open)}
+            className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 active:scale-95 ${
+              activeSort
+                ? "border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            📍 {activeSort ? `Sorted by zip ${activeSort.label}` : "Find Closest Lab"}
+          </button>
         </div>
         <div className="overflow-auto border border-gray-200 rounded-xl scrollbar-modern">
           <table className="w-full text-sm">
