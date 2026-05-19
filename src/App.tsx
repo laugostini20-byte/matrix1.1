@@ -2182,6 +2182,9 @@ function DetailView({
             <div className="flex items-center gap-2 flex-wrap">
               <input
                 type="text"
+                id="zip-sort-input"
+                aria-label="Postal code for lab distance sort"
+                aria-describedby={zipError ? "zip-sort-error" : undefined}
                 value={zipInput}
                 onChange={handleZipInputChange}
                 onKeyDown={handleZipKeyDown}
@@ -2215,7 +2218,13 @@ function DetailView({
               )}
             </div>
             {zipError && (
-              <p className="mt-2 text-xs text-red-600">{zipError}</p>
+              <p
+                id="zip-sort-error"
+                role="alert"
+                className="mt-2 text-xs text-red-600"
+              >
+                {zipError}
+              </p>
             )}
           </div>
         )}
