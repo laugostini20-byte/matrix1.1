@@ -2263,8 +2263,12 @@ function DetailView({
                       </td>
                       <td className="py-2 px-3 whitespace-nowrap font-medium">
                         {c.labName}
-                        {c.distanceMi != null && c.distanceMi !== Infinity && (
-                          <span className="ml-1 text-xs text-gray-500 font-normal">
+                        {Number.isFinite(c.distanceMi) && (
+                          <span
+                            className={`ml-1 text-xs font-normal ${
+                              darkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                          >
                             ({c.distanceMi} mi)
                           </span>
                         )}
