@@ -1884,6 +1884,42 @@ function DetailView({
   } | null>(null);
   const [zipError, setZipError] = useState<string | null>(null);
 
+  const handleZipSort = () => {
+    const trimmed = zipInput.trim();
+    if (!trimmed) {
+      setZipError(null);
+      return;
+    }
+    if (!isValidPostalFormat(trimmed)) {
+      setZipError("Enter a 5-digit US zip or Canadian postal code (e.g., M5H 2N2)");
+      return;
+    }
+    const coords = getCoordsForPostalCode(trimmed);
+    if (!coords) {
+      setZipError("Postal code not recognized");
+      return;
+    }
+    setZipError(null);
+    setActiveSort({ coords, postalCode: trimmed.toUpperCase() });
+  };
+
+  const handleZipClear = () => {
+    setActiveSort(null);
+    setZipError(null);
+  };
+
+  const handleZipInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setZipInput(e.target.value);
+    if (zipError) setZipError(null);
+  };
+
+  const handleZipKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleZipSort();
+    }
+  };
+
   // Get lab capabilities using the new resolver
   const labCaps = useMemo(
     () =>
@@ -2137,6 +2173,52 @@ function DetailView({
             📍 {activeSort ? `Sorted near ${activeSort.postalCode}` : "Find Closest Lab"}
           </button>
         </div>
+        {zipPanelOpen && (
+          <div
+            className={`mb-4 p-3 rounded-lg border ${
+              darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"
+            }`}
+          >
+            <div className="flex items-center gap-2 flex-wrap">
+              <input
+                type="text"
+                value={zipInput}
+                onChange={handleZipInputChange}
+                onKeyDown={handleZipKeyDown}
+                placeholder="e.g. 14624 or M5H 2N2"
+                maxLength={7}
+                className={`px-3 py-2 text-sm rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                  darkMode
+                    ? "bg-gray-900 border-gray-600 text-white"
+                    : "bg-white border-gray-300 text-gray-900"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={handleZipSort}
+                className="px-3 py-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              >
+                Sort by Distance
+              </button>
+              {activeSort && (
+                <button
+                  type="button"
+                  onClick={handleZipClear}
+                  className={`px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
+                    darkMode
+                      ? "border-gray-600 text-gray-300 hover:bg-gray-700"
+                      : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            {zipError && (
+              <p className="mt-2 text-xs text-red-600">{zipError}</p>
+            )}
+          </div>
+        )}
         <div className="overflow-auto border border-gray-200 rounded-xl scrollbar-modern">
           <table className="w-full text-sm">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
