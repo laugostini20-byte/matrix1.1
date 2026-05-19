@@ -10,7 +10,6 @@ export * from "./pricing-utils";
 export * from "./diagnostics";
 export * from "./modals";
 export * from "./upload-page";
-export * from "./detail-view";
 
 // Explicitly re-export optimization utilities to avoid conflicts
 export type {
