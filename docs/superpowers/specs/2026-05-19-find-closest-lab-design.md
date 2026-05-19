@@ -1,7 +1,7 @@
 # Find Closest Lab — Design Spec
 
 **Date:** 2026-05-19
-**Status:** Approved, pending implementation plan
+**Status:** Shipped
 **Scope:** Part Number Detail page — Lab Capabilities section
 
 ## Summary
@@ -19,7 +19,7 @@ The Lab Capabilities table currently shows eligible labs in a default order that
 3. An inline panel expands below the heading with a zip/postal code input and a **Sort by Distance** button
 4. User types a code (e.g., `14624` or `M5H 2N2`) and clicks Sort
 5. The table reorders closest → furthest; each lab name now reads `Rochester Lab (12 mi)`, etc.
-6. A **Clear** button is now visible; clicking it restores default order. Collapsing the panel does NOT clear the sort — the button label updates to `📍 Sorted by zip 14624` to make the active state visible.
+6. A **Clear** button is now visible; clicking it restores default order. Collapsing the panel does NOT clear the sort — the button label updates to `📍 Sorted near 14624` to make the active state visible.
 
 ## UI Details
 
@@ -27,7 +27,7 @@ The Lab Capabilities table currently shows eligible labs in a default order that
 
 - Placement: right side of the "🏭 Lab Capabilities" heading row
 - Style: matches the existing utility-button pattern in the section (compact, rounded, neutral background)
-- Label: `📍 Find Closest Lab` (or `📍 Sorted by zip 14624` when active, to reinforce state)
+- Label: `📍 Find Closest Lab` (or `📍 Sorted near 14624` when active, to reinforce state). The wording is locale-neutral so it reads correctly for both US zip codes and Canadian postal codes.
 
 ### Expanded panel
 
@@ -94,7 +94,7 @@ const [zipPanelOpen, setZipPanelOpen] = useState(false);
 const [zipInput, setZipInput] = useState("");
 const [activeSort, setActiveSort] = useState<{
   coords: [number, number];
-  label: string; // for the "Sorted by zip X" button label
+  postalCode: string; // the user-typed code, echoed back in the "Sorted near X" button label
 } | null>(null);
 const [zipError, setZipError] = useState<string | null>(null);
 ```
