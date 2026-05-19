@@ -1982,9 +1982,13 @@ function DetailView({
     [unit]
   );
 
-  const sortedCaps = activeSort
-    ? sortLabsByDistance(caps, activeSort.coords)
-    : caps.map((c) => ({ ...c, distanceMi: null as number | null }));
+  const sortedCaps = useMemo(
+    () =>
+      activeSort
+        ? sortLabsByDistance(caps, activeSort.coords)
+        : caps.map((c) => ({ ...c, distanceMi: null as number | null })),
+    [caps, activeSort]
+  );
 
   return (
     <div className="glass-card p-6 animate-fade-in">
@@ -2246,10 +2250,10 @@ function DetailView({
               </tr>
             </thead>
             <tbody>
-              {sortedCaps.map((c, i) => {
+              {sortedCaps.map((c) => {
                 const isExpanded = expandedLabs.has(c.labCode);
                 return (
-                  <React.Fragment key={i}>
+                  <React.Fragment key={c.labCode}>
                     <tr
                       className={`border-t border-slate-100 cursor-pointer ${
                         darkMode ? "hover:bg-gray-800" : "hover:bg-slate-50"
