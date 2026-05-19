@@ -8,7 +8,7 @@ const US_ZIPS = usZipsRaw as unknown as Record<string, [number, number]>;
 const CA_FSAS = caFsasRaw as unknown as Record<string, [number, number]>;
 
 const US_ZIP_RE = /^\d{5}$/;
-const CA_FSA_RE = /^[A-Z]\d[A-Z]/;
+const CA_FSA_RE = /^[A-Z]\d[A-Z](\d[A-Z]\d)?$/;
 
 /**
  * Resolves a user-entered postal code to [lat, lng].
@@ -26,7 +26,7 @@ export function getCoordsForPostalCode(input: string): [number, number] | null {
 
   const fsaMatch = normalized.match(CA_FSA_RE);
   if (fsaMatch) {
-    return CA_FSAS[fsaMatch[0]] ?? null;
+    return CA_FSAS[fsaMatch[0].slice(0, 3)] ?? null;
   }
 
   return null;
