@@ -53,6 +53,7 @@ export function selectPreferredTMSVendor(
 import { UNITS } from "../data/units";
 import { LAB_LOCATIONS } from "./constants";
 import type { LabLocation } from "./constants";
+import { getCoordsForPostalCode } from "../business-logic/zip-distance";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lab Capacity and Location Utilities
@@ -90,45 +91,20 @@ export function calculateDistance(
   return R * c;
 }
 
-// Find closest lab to a given zip code (simplified - you'd want to use a real geocoding service)
+// Find closest lab to a given postal code (US zip or Canadian FSA).
+// Uses the bundled ~42k US zip + ~80 CA FSA coordinate dataset via
+// getCoordsForPostalCode. Returns null when the postal code is unrecognized
+// or not present in the dataset (matching the prior unknown-zip behavior).
 export function findClosestLab(zipCode: string): LabLocation | null {
-  // This is a simplified lookup - in reality you'd geocode the zip code
-  const zipToCoords: Record<string, { lat: number; lng: number }> = {
-    // Northeast
-    "02101": { lat: 42.3601, lng: -71.0589 }, // Boston
-    "10001": { lat: 40.7589, lng: -73.9851 }, // NYC
-    "14624": { lat: 43.1566, lng: -77.6088 }, // Rochester
-    "19101": { lat: 39.9526, lng: -75.1652 }, // Philadelphia
-    // Midwest
-    "44101": { lat: 41.4993, lng: -81.6944 }, // Cleveland
-    "45201": { lat: 39.1031, lng: -84.512 }, // Cincinnati
-    "60601": { lat: 41.8781, lng: -87.6298 }, // Chicago
-    "48201": { lat: 42.3314, lng: -83.0458 }, // Detroit
-    // South
-    "77001": { lat: 29.7604, lng: -95.3698 }, // Houston
-    "30301": { lat: 33.749, lng: -84.388 }, // Atlanta
-    "75201": { lat: 32.7767, lng: -96.797 }, // Dallas
-    // West
-    "80202": { lat: 39.7392, lng: -104.9903 }, // Denver
-    "90001": { lat: 34.0522, lng: -118.2437 }, // Los Angeles
-    "97201": { lat: 45.5152, lng: -122.6784 }, // Portland
-    "98101": { lat: 47.6062, lng: -122.3321 }, // Seattle
-    "85001": { lat: 33.4484, lng: -112.074 }, // Phoenix
-  };
-
-  const coords = zipToCoords[zipCode];
+  const coords = getCoordsForPostalCode(zipCode);
   if (!coords) return null;
 
+  const [lat, lng] = coords;
   let closestLab: LabLocation | null = null;
   let minDistance = Infinity;
 
   for (const lab of LAB_LOCATIONS) {
-    const distance = calculateDistance(
-      coords.lat,
-      coords.lng,
-      lab.lat,
-      lab.lng
-    );
+    const distance = calculateDistance(lat, lng, lab.lat, lab.lng);
     if (distance < minDistance) {
       minDistance = distance;
       closestLab = lab;
