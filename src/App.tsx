@@ -13,7 +13,6 @@ import { CopyButton } from "./components/CopyButton";
 import { ComparisonModal } from "./components/modals/ComparisonModal";
 import { serializeCaps, serializePricing } from "./utils/serialization";
 import { buildServiceLevelText, exportServiceLevelText, exportAllUnitsData } from "./utils/export";
-import { calculateLabRecommendation, getRecommendationColors } from "./business-logic/lab-recommendations";
 import { useDebounce } from "./hooks/useDebounce";
 import { AppStateProvider, useAppState } from "./context/AppStateContext";
 import { SearchProvider, useSearch } from "./context/SearchContext";
@@ -2110,9 +2109,6 @@ function DetailView({
               Lab Capabilities
             </h3>
           </div>
-          {supportsOnsiteCalibration(unit.part_number) && (
-            <span className="badge badge-info">✓ Onsite Capable</span>
-          )}
         </div>
         <div className="overflow-auto border border-gray-200 rounded-xl scrollbar-modern">
           <table className="w-full text-sm">
@@ -2122,7 +2118,6 @@ function DetailView({
                 <th className="py-4 px-4">Lab</th>
                 <th className="py-4 px-4">Accredited</th>
                 <th className="py-4 px-4">Standards</th>
-                <th className="py-2 px-3">Recommendation</th>
                 <th className="py-2 px-3">Stock TT</th>
                 <th className="py-2 px-3">Recal TT</th>
                 <th className="py-2 px-3">Repair TT</th>
@@ -2156,137 +2151,6 @@ function DetailView({
                       </td>
                       <td className="py-2 px-3 whitespace-nowrap text-blue-600 font-medium">
                         {c.matchingStandards.length} matching
-                      </td>
-                      <td className="py-2 px-3">
-                        {(() => {
-                          const capacity = LAB_CAPACITY[c.labName] || 50;
-                          const recommendation = calculateLabRecommendation(
-                            c,
-                            capacity
-                          );
-                          const colors = getRecommendationColors(
-                            recommendation.score
-                          );
-
-                          return (
-                            <div className="flex items-center gap-2 relative group">
-                              {/* Horizontal Progress Bar */}
-                              <div className="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden min-w-[80px] max-w-[120px] cursor-help">
-                                <div
-                                  className={`h-full ${colors.bg} transition-all duration-300`}
-                                  style={{
-                                    width: `${recommendation.score}%`,
-                                  }}
-                                />
-                              </div>
-
-                              {/* Score and Rating Container - Positioned to the right */}
-                              <div className="flex flex-col items-start min-w-[50px]">
-                                {/* Numerical Score */}
-                                <span
-                                  className={`text-sm font-bold ${colors.text}`}
-                                >
-                                  {recommendation.score}
-                                </span>
-
-                                {/* Textual Rating */}
-                                <span className="text-xs text-gray-600">
-                                  {recommendation.score >= 80
-                                    ? "Excellent"
-                                    : recommendation.score >= 60
-                                    ? "Good"
-                                    : recommendation.score >= 40
-                                    ? "Fair"
-                                    : "Poor"}
-                                </span>
-                              </div>
-
-                              {/* Custom Tooltip */}
-                              <div
-                                className="absolute w-64 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 p-4"
-                                style={{
-                                  position: "absolute",
-                                  top: "100%",
-                                  left: "0",
-                                  marginTop: "8px",
-                                  maxHeight: "300px",
-                                  overflowY: "auto",
-                                }}
-                              >
-                                {/* Header */}
-                                <div className="text-sm font-bold text-white mb-3">
-                                  Score Breakdown
-                                </div>
-
-                                {/* Score Breakdown */}
-                                <div className="space-y-1">
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-white">
-                                      Capacity:
-                                    </span>
-                                    <span className="text-green-400 font-medium">
-                                      +{recommendation.breakdown.capacityScore}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-white">
-                                      Turnaround:
-                                    </span>
-                                    <span className="text-blue-400 font-medium">
-                                      +
-                                      {recommendation.breakdown.turnaroundScore}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-white">
-                                      Accreditation:
-                                    </span>
-                                    <span className="text-purple-400 font-medium">
-                                      +
-                                      {
-                                        recommendation.breakdown
-                                          .accreditationBonus
-                                      }
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-white">
-                                      Standards:
-                                    </span>
-                                    <span className="text-yellow-400 font-medium">
-                                      +{recommendation.breakdown.standardsScore}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-white">
-                                      Experience:
-                                    </span>
-                                    <span className="text-orange-400 font-medium">
-                                      +
-                                      {recommendation.breakdown.experienceScore}
-                                    </span>
-                                  </div>
-
-                                  {/* Total */}
-                                  <div className="pt-2 border-t border-gray-700 flex justify-between items-center">
-                                    <span className="font-bold text-white">
-                                      Total:
-                                    </span>
-                                    <span className="font-bold text-white">
-                                      {recommendation.score}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {/* Tooltip Arrow - Top */}
-                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 tooltip-arrow-top"></div>
-
-                                {/* Tooltip Arrow - Bottom */}
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900 tooltip-arrow-bottom opacity-0"></div>
-                              </div>
-                            </div>
-                          );
-                        })()}
                       </td>
                       <td className="py-2 px-3 whitespace-nowrap">
                         <span
@@ -2322,7 +2186,7 @@ function DetailView({
                     {isExpanded && (
                       <tr className="border-t border-slate-100 bg-slate-50">
                         <td></td>
-                        <td colSpan={7} className="py-3 px-3">
+                        <td colSpan={6} className="py-3 px-3">
                           <div className="text-xs font-semibold text-slate-700 mb-2">
                             Matching Standards at {c.labName}:
                           </div>
@@ -3320,11 +3184,6 @@ function UnitDetailsModal({
               }`}
             >
               <span>Lab Capabilities Summary</span>
-              {supportsOnsiteCalibration(unit.part_number) && (
-                <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                  ✓ Onsite Capable
-                </span>
-              )}
             </h3>
             <div className="overflow-auto border border-slate-200 rounded-lg">
               <table className="w-full text-sm">

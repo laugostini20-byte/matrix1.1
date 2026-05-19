@@ -3,10 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import {
-  getLabCapabilitiesForUnit,
-  supportsOnsiteCalibration,
-} from "../../data/labs";
+import { getLabCapabilitiesForUnit } from "../../data/labs";
 import {
   SERVICE_LEVEL_DESC,
   ALL_LEVELS,
@@ -547,9 +544,6 @@ export function DetailView({
               Lab Capabilities
             </h3>
           </div>
-          {supportsOnsiteCalibration(unit.part_number) && (
-            <span className="badge badge-info">✓ Onsite Capable</span>
-          )}
         </div>
         <div className="overflow-auto border border-gray-200 rounded-xl scrollbar-modern">
           <table className="w-full text-sm">

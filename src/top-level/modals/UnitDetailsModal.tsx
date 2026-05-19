@@ -3,10 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import React, { useState, useMemo } from "react";
-import {
-  getEligibleLabsForUnit,
-  supportsOnsiteCalibration,
-} from "../../data/labs";
+import { getEligibleLabsForUnit } from "../../data/labs";
 import { SERVICE_LEVEL_DESC, LAB_CAPACITY } from "../constants";
 import {
   money,
@@ -409,11 +406,6 @@ export function UnitDetailsModal({
               }`}
             >
               <span>Lab Capabilities Summary</span>
-              {supportsOnsiteCalibration(unit.part_number) && (
-                <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                  ✓ Onsite Capable
-                </span>
-              )}
             </h3>
             <div className="overflow-auto border border-slate-200 rounded-lg">
               <table className="w-full text-sm">
