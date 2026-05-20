@@ -5,40 +5,8 @@
 import { UNITS } from "../../data/units";
 import { getEligibleLabsForUnit } from "../../data/labs";
 import { normalize, findClosestLab } from "../utils";
-import { ALL_LEVELS } from "../constants";
-import type { Unit, CustomerItem, MatchResult, UploadParseResult, UnitPricing, PricingRow } from "../types";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Pricing Helper Functions (temporary - will be moved to pricing module)
-// ─────────────────────────────────────────────────────────────────────────────
-
-function roundCents(n: number) {
-  return Math.round(n * 100) / 100;
-}
-
-function calculateServiceLevelPrice(basePrice: number, level: number): number {
-  if (level === 1) return basePrice;
-  const multiplier = Math.pow(1.1, level - 1);
-  return roundCents(basePrice * multiplier);
-}
-
-function generatePricingRows(unitPricing: UnitPricing): PricingRow[] {
-  return ALL_LEVELS.map((level: number) => {
-    const basePrice = calculateServiceLevelPrice(
-      unitPricing.base_price_usd,
-      level
-    );
-    const basePlusOptions = calculateServiceLevelPrice(
-      unitPricing.base_price_usd + unitPricing.options_addon_usd,
-      level
-    );
-    return {
-      service_level: level,
-      base_price_usd: basePrice,
-      base_plus_options_usd: basePlusOptions,
-    };
-  });
-}
+import { generatePricingRows } from "../pricing-utils";
+import type { Unit, CustomerItem, MatchResult, UploadParseResult } from "../types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CSV Parsing Functions
