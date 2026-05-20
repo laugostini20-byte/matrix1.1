@@ -19,8 +19,6 @@ export type MatchResultRowProps = {
   result: MatchResult;
   expandedRows: Set<number>;
   selectedMatches: Map<number, Unit>;
-  selectedLabs: Map<number, string>;
-  selectedPrices: Map<number, number>;
   bulkSelectedRows: Set<number>;
   multiSelectMode: Map<number, boolean>;
   transferLabs: Set<number>;

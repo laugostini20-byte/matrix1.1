@@ -736,8 +736,6 @@ export function UploadPage({
                       result={result}
                       expandedRows={expandedRows}
                       selectedMatches={selectedMatches}
-                      selectedLabs={selectedLabs}
-                      selectedPrices={selectedPrices}
                       bulkSelectedRows={bulkSelectedRows}
                       multiSelectMode={multiSelectMode}
                       transferLabs={transferLabs}
