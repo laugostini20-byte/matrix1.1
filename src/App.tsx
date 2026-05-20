@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+﻿import React, { useMemo, useState, useEffect, useRef } from "react";
 import {
   LABS,
   getStandardsForPN,
@@ -10,6 +10,7 @@ import { ServiceLevelSelector } from "./components/ServiceLevelSelector";
 import { CopyButton } from "./components/CopyButton";
 import { ComparisonModal } from "./components/modals/ComparisonModal";
 import { ManualSearchModal } from "./components/modals/ManualSearchModal";
+import { UnitDetailsModal } from "./components/modals/UnitDetailsModal";
 import { Diagnostics } from "./components/diagnostics/Diagnostics";
 import { ServiceLevelMultiSelect } from "./components/ServiceLevelMultiSelect";
 import { UnmatchedItemsSection } from "./components/UnmatchedItemsSection";
@@ -61,17 +62,17 @@ import {
   sortLabsByDistance,
 } from "./business-logic/zip-distance";
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Main App Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Upload functionality
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Chart Components - Pure CSS/SVG
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // TODO: Move to charts folder - currently unused
 /*
@@ -894,20 +895,20 @@ function AppContent() {
     let message = "";
 
     if (directApplied > 0) {
-      message += `✓ Applied ${lab} to ${directApplied} item(s)\n`;
+      message += `âœ“ Applied ${lab} to ${directApplied} item(s)\n`;
     }
 
     if (fallbackApplied > 0) {
-      message += `\n🔄 Used proximity fallback for ${fallbackApplied} item(s):\n`;
+      message += `\nðŸ”„ Used proximity fallback for ${fallbackApplied} item(s):\n`;
       Object.entries(fallbackDetails)
         .sort((a, b) => b[1] - a[1]) // Sort by count descending
         .forEach(([fallbackLab, count]) => {
-          message += `  • ${fallbackLab}: ${count} item(s) (closest alternative to ${lab})\n`;
+          message += `  â€¢ ${fallbackLab}: ${count} item(s) (closest alternative to ${lab})\n`;
         });
     }
 
     if (skipped > 0) {
-      message += `\n⚠ Skipped ${skipped} item(s) (no capable labs):\n`;
+      message += `\nâš  Skipped ${skipped} item(s) (no capable labs):\n`;
       message += skippedItems.slice(0, 5).join("\n");
       if (skippedItems.length > 5) {
         message += `\n  ... and ${skippedItems.length - 5} more`;
@@ -1115,7 +1116,7 @@ function AppContent() {
                 }`}
                 title="Toggle dark mode"
               >
-                <span className="text-lg">{darkMode ? "☀️" : "🌙"}</span>
+                <span className="text-lg">{darkMode ? "â˜€ï¸" : "ðŸŒ™"}</span>
               </button>
               <button
                 onClick={() => setShowDiag((v: boolean) => !v)}
@@ -1138,7 +1139,7 @@ function AppContent() {
                 currentPage === "search" ? "tab-btn-active" : "tab-btn-inactive"
               }`}
             >
-              <span className="mr-2">🔍</span>
+              <span className="mr-2">ðŸ”</span>
               Search
             </button>
             <button
@@ -1152,7 +1153,7 @@ function AppContent() {
                   : "text-gray-300 cursor-not-allowed"
               }`}
             >
-              <span className="mr-2">📊</span>
+              <span className="mr-2">ðŸ“Š</span>
               Details{" "}
               {selected && (
                 <span className="ml-1 text-xs opacity-60">
@@ -1166,7 +1167,7 @@ function AppContent() {
                 currentPage === "upload" ? "tab-btn-active" : "tab-btn-inactive"
               }`}
             >
-              <span className="mr-2">📤</span>
+              <span className="mr-2">ðŸ“¤</span>
               Bulk Upload
             </button>
           </div>
@@ -1241,7 +1242,7 @@ function AppContent() {
                   <details className="mt-5 group">
                     <summary className="text-sm text-red-600 cursor-pointer hover:text-red-700 font-medium list-none flex items-center gap-2">
                       <span className="w-6 h-6 flex items-center justify-center bg-red-100 rounded-full text-xs group-open:rotate-90 transition-transform">
-                        ▶
+                        â–¶
                       </span>
                       View {coverageStats.uncoveredPNs.length} uncovered part
                       numbers
@@ -1266,7 +1267,7 @@ function AppContent() {
             {/* Modern Search Interface */}
             <div className="glass-card p-6 animate-fade-in">
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">🔍</span>
+                <span className="text-2xl">ðŸ”</span>
                 <h2
                   className={`text-lg font-semibold ${
                     darkMode ? "text-white" : "text-gray-900"
@@ -1304,7 +1305,7 @@ function AppContent() {
               <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
                 <p className="text-xs text-gray-500 font-medium">
                   {!compareMode
-                    ? "Type to search • Click a row for details"
+                    ? "Type to search â€¢ Click a row for details"
                     : "Select units to compare"}
                 </p>
                 <div className="flex items-center gap-2">
@@ -1319,7 +1320,7 @@ function AppContent() {
                         : "bg-white/80 text-blue-600 border border-blue-200 hover:bg-blue-50"
                     }`}
                   >
-                    {compareMode ? "✓ Compare Mode" : "Compare Units"}
+                    {compareMode ? "âœ“ Compare Mode" : "Compare Units"}
                   </button>
                   <button
                     onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
@@ -1334,7 +1335,7 @@ function AppContent() {
               {showAdvancedFilters && (
                 <div className="mt-5 p-5 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 animate-fade-in">
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-lg">⚙️</span>
+                    <span className="text-lg">âš™ï¸</span>
                     <h3 className="text-sm font-semibold text-gray-900">
                       Advanced Filters
                     </h3>
@@ -1387,7 +1388,7 @@ function AppContent() {
                     }}
                     className="mt-4 text-xs font-medium text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-white transition-all duration-200"
                   >
-                    ✕ Clear Filters
+                    âœ• Clear Filters
                   </button>
                 </div>
               )}
@@ -1398,14 +1399,14 @@ function AppContent() {
               {compareMode && selectedForCompare.size > 0 && (
                 <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 flex items-center justify-between">
                   <span className="text-sm font-medium text-blue-900">
-                    ✓ {selectedForCompare.size} unit
+                    âœ“ {selectedForCompare.size} unit
                     {selectedForCompare.size !== 1 ? "s" : ""} selected
                   </span>
                   <button
                     onClick={() => setShowCompareModal(true)}
                     className="btn-primary text-xs py-2 px-4"
                   >
-                    View Comparison →
+                    View Comparison â†’
                   </button>
                 </div>
               )}
@@ -1429,7 +1430,7 @@ function AppContent() {
                         >
                           <div className="flex flex-col items-center gap-4 animate-fade-in">
                             <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
-                              <span className="text-4xl">🔍</span>
+                              <span className="text-4xl">ðŸ”</span>
                             </div>
                             <div className="text-xl font-semibold text-gray-900">
                               Start Your Search
@@ -1679,15 +1680,15 @@ function AppContent() {
       </main>
 
       <footer className="py-10 text-center text-xs text-slate-500">
-        POC only • Mock data • Ready to wire to real endpoints
+        POC only â€¢ Mock data â€¢ Ready to wire to real endpoints
       </footer>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Detail View (Page B)
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function DetailView({
   unit,
@@ -1876,7 +1877,7 @@ function DetailView({
           </div>
           <div className={`mt-4 mb-2 p-3 rounded-lg bg-blue-50 border border-blue-200 ${darkMode ? "bg-blue-900/30 border-blue-700" : ""}`}>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold">⏱ Standard Time:</span>
+              <span className="text-sm font-semibold">â± Standard Time:</span>
               <span className="text-base font-bold text-blue-600">{(unit.standardTime || 0).toFixed(1)} hours</span>
             </div>
           </div>
@@ -1895,7 +1896,7 @@ function DetailView({
           {minTT !== null && (
             <div className="flex justify-center">
               <span className={clsx("text-xs font-medium", ttColor(minTT))}>
-                ≥{minTT} day turnaround
+                â‰¥{minTT} day turnaround
               </span>
             </div>
           )}
@@ -1911,7 +1912,7 @@ function DetailView({
         }`}
       >
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-lg">🎯</span>
+          <span className="text-lg">ðŸŽ¯</span>
           <h3
             className={`text-sm font-semibold ${
               darkMode ? "text-white" : "text-gray-900"
@@ -1961,7 +1962,7 @@ function DetailView({
               }}
               className="btn-secondary w-full text-sm"
             >
-              ✕ Reset Filters
+              âœ• Reset Filters
             </button>
           </div>
         </div>
@@ -1977,7 +1978,7 @@ function DetailView({
               darkMode ? "text-blue-300" : "text-blue-900"
             }`}
           >
-            ✓ {caps.length} lab{caps.length !== 1 ? "s" : ""} match your
+            âœ“ {caps.length} lab{caps.length !== 1 ? "s" : ""} match your
             criteria
           </div>
         </div>
@@ -1987,7 +1988,7 @@ function DetailView({
       <section className="mt-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-lg">🏭</span>
+            <span className="text-lg">ðŸ­</span>
             <h3
               className={`text-lg font-semibold ${
                 darkMode ? "text-white" : "text-gray-900"
@@ -2009,7 +2010,7 @@ function DetailView({
                   : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
-            📍 {activeSort ? `Sorted near ${activeSort.postalCode}` : "Find Closest Lab"}
+            ðŸ“ {activeSort ? `Sorted near ${activeSort.postalCode}` : "Find Closest Lab"}
           </button>
         </div>
         {zipPanelOpen && (
@@ -2093,7 +2094,7 @@ function DetailView({
                     >
                       <td className="py-2 px-3">
                         <span className="text-slate-400">
-                          {isExpanded ? "▼" : "▶"}
+                          {isExpanded ? "â–¼" : "â–¶"}
                         </span>
                       </td>
                       <td className="py-2 px-3 whitespace-nowrap font-medium">
@@ -2110,7 +2111,7 @@ function DetailView({
                       </td>
                       <td className="py-2 px-3 whitespace-nowrap">
                         {c.isAccredited ? (
-                          <span className="text-green-600">✓ Yes</span>
+                          <span className="text-green-600">âœ“ Yes</span>
                         ) : (
                           <span className="text-slate-400">No</span>
                         )}
@@ -2194,7 +2195,7 @@ function DetailView({
       <section className="mt-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-lg">🏢</span>
+            <span className="text-lg">ðŸ¢</span>
             <h3
               className={`text-lg font-semibold ${
                 darkMode ? "text-white" : "text-gray-900"
@@ -2211,7 +2212,7 @@ function DetailView({
               darkMode ? "text-gray-400" : "text-gray-600"
             } italic`}
           >
-            No TMS applicable—this unit is serviceable in-house.
+            No TMS applicableâ€”this unit is serviceable in-house.
           </div>
         ) : (
           <div className="space-y-4">
@@ -2225,7 +2226,7 @@ function DetailView({
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">⭐</span>
+                  <span className="text-lg">â­</span>
                   <span
                     className={`font-semibold ${
                       darkMode ? "text-blue-300" : "text-blue-700"
@@ -2324,7 +2325,7 @@ function DetailView({
                         <div className="flex items-center gap-2">
                           {preferredTMSVendor?.vendor_name ===
                             vendor.vendor_name && (
-                            <span className="text-yellow-500">⭐</span>
+                            <span className="text-yellow-500">â­</span>
                           )}
                           <span
                             className={`font-medium ${
@@ -2374,7 +2375,7 @@ function DetailView({
                             darkMode ? "text-gray-400" : "text-gray-600"
                           }`}
                         >
-                          {vendor.notes || "—"}
+                          {vendor.notes || "â€”"}
                         </span>
                       </td>
                     </tr>
@@ -2429,7 +2430,7 @@ function DetailView({
                       darkMode ? "text-gray-300" : "text-slate-700"
                     }`}
                   >
-                    {SERVICE_LEVEL_DESC[p.service_level] || "—"}
+                    {SERVICE_LEVEL_DESC[p.service_level] || "â€”"}
                   </td>
                   <td
                     className={`py-2 pr-3 whitespace-nowrap font-semibold ${
@@ -2478,7 +2479,7 @@ function DetailView({
       {prices.length > 0 && (
         <section className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <HorizontalBarChart
-            title="📊 Price Comparison by Service Level"
+            title="ðŸ“Š Price Comparison by Service Level"
             data={prices.map((p) => ({
               label: `Level ${p.service_level} - ${
                 SERVICE_LEVEL_DESC[p.service_level]
@@ -2503,7 +2504,7 @@ function DetailView({
           />
           {caps.length > 0 && (
             <HorizontalBarChart
-              title="⚡ Lab Turnaround Times"
+              title="âš¡ Lab Turnaround Times"
               data={caps
                 .sort((a, b) => a.recalTT - b.recalTT) // Sort by turnaround time
                 .map((c) => ({
@@ -2527,619 +2528,9 @@ function DetailView({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Unit Details Modal Component
-// ─────────────────────────────────────────────────────────────────────────────
-function UnitDetailsModal({
-  unit,
-  rowIndex,
-  serviceLevel,
-  selectedLab,
-  onClose,
-  darkMode,
-}: {
-  unit: Unit;
-  rowIndex: number;
-  serviceLevel: number;
-  selectedLab: string;
-  onClose: () => void;
-  darkMode?: boolean;
-}) {
-  const [expandedLabs, setExpandedLabs] = useState<Set<string>>(new Set());
-
-  const pricingRows = useMemo(() => generatePricingRows(unit.pricing), [unit]);
-  const currentPricing = pricingRows.find(
-    (p) => p.service_level === serviceLevel
-  );
-
-  // Get eligible labs for this unit
-  const capsWithStandards = useMemo(
-    () =>
-      getEligibleLabsForUnit({
-        partNumber: unit.part_number,
-        requiredCapabilityTags: unit.requiredCapabilityTags,
-      }),
-    [unit]
-  );
-
-  // Find the selected lab capability
-  const selectedLabCapability = selectedLab
-    ? capsWithStandards.find((cap) => cap.labName === selectedLab)
-    : null;
-
-  const toggleLab = (labCode: string) => {
-    const newExpanded = new Set(expandedLabs);
-    if (newExpanded.has(labCode)) {
-      newExpanded.delete(labCode);
-    } else {
-      newExpanded.add(labCode);
-    }
-    setExpandedLabs(newExpanded);
-  };
-
-  return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className={`rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto ${
-          darkMode ? "bg-gray-800" : "bg-white"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div
-          className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between rounded-t-2xl ${
-            darkMode
-              ? "bg-gray-800 border-gray-600"
-              : "bg-white border-slate-200"
-          }`}
-        >
-          <div>
-            <h2
-              className={`text-xl font-bold ${
-                darkMode ? "text-white" : "text-slate-900"
-              }`}
-            >
-              Unit Details
-            </h2>
-            <p
-              className={`text-sm ${
-                darkMode ? "text-gray-400" : "text-slate-500"
-              }`}
-            >
-              Row {rowIndex + 1}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className={`p-2 rounded-full transition-colors ${
-              darkMode ? "hover:bg-gray-700" : "hover:bg-slate-100"
-            }`}
-            title="Close"
-          >
-            <svg
-              className={`w-6 h-6 ${
-                darkMode ? "text-gray-300" : "text-slate-600"
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Part Information */}
-          <section>
-            <h3
-              className={`text-lg font-semibold mb-3 ${
-                darkMode ? "text-white" : "text-slate-900"
-              }`}
-            >
-              Part Information
-            </h3>
-            <div
-              className={`rounded-lg p-4 space-y-2 ${
-                darkMode ? "bg-gray-700" : "bg-slate-50"
-              }`}
-            >
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div
-                    className={`text-xs uppercase font-medium ${
-                      darkMode ? "text-gray-400" : "text-slate-500"
-                    }`}
-                  >
-                    Internal Part Number
-                  </div>
-                  <div
-                    className={`text-base font-semibold ${
-                      darkMode ? "text-white" : "text-slate-900"
-                    }`}
-                  >
-                    {unit.part_number}
-                  </div>
-                </div>
-                <div>
-                  <div
-                    className={`text-xs uppercase font-medium ${
-                      darkMode ? "text-gray-400" : "text-slate-500"
-                    }`}
-                  >
-                    Manufacturer
-                  </div>
-                  <div
-                    className={`text-base font-semibold ${
-                      darkMode ? "text-white" : "text-slate-900"
-                    }`}
-                  >
-                    {unit.manufacturer}
-                  </div>
-                </div>
-                <div>
-                  <div
-                    className={`text-xs uppercase font-medium ${
-                      darkMode ? "text-gray-400" : "text-slate-500"
-                    }`}
-                  >
-                    Model Number
-                  </div>
-                  <div
-                    className={`text-base font-semibold ${
-                      darkMode ? "text-white" : "text-slate-900"
-                    }`}
-                  >
-                    {unit.model_number}
-                  </div>
-                </div>
-                <div>
-                  <div
-                    className={`text-xs uppercase font-medium ${
-                      darkMode ? "text-gray-400" : "text-slate-500"
-                    }`}
-                  >
-                    Subgroup
-                  </div>
-                  <div
-                    className={`text-base font-semibold ${
-                      darkMode ? "text-white" : "text-slate-900"
-                    }`}
-                  >
-                    {unit.subgroup || "N/A"}
-                  </div>
-                </div>
-                <div>
-                  <div
-                    className={`text-xs uppercase font-medium ${
-                      darkMode ? "text-gray-400" : "text-slate-500"
-                    }`}
-                  >
-                    Standard Time
-                  </div>
-                  <div
-                    className={`text-base font-semibold ${
-                      darkMode ? "text-white" : "text-slate-900"
-                    }`}
-                  >
-                    {(unit.standardTime || 0).toFixed(1)} hours
-                  </div>
-                </div>
-                <div className="col-span-2">
-                  <div
-                    className={`text-xs uppercase font-medium ${
-                      darkMode ? "text-gray-400" : "text-slate-500"
-                    }`}
-                  >
-                    Description
-                  </div>
-                  <div
-                    className={`text-sm ${
-                      darkMode ? "text-gray-300" : "text-slate-700"
-                    }`}
-                  >
-                    {unit.description}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Current Selection Summary */}
-          <section>
-            <h3
-              className={`text-lg font-semibold mb-3 ${
-                darkMode ? "text-white" : "text-slate-900"
-              }`}
-            >
-              Current Selection
-            </h3>
-            <div
-              className={`border rounded-lg p-4 space-y-3 ${
-                darkMode
-                  ? "bg-blue-900/30 border-blue-700"
-                  : "bg-blue-50 border-blue-200"
-              }`}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <div
-                    className={`text-xs uppercase font-medium ${
-                      darkMode ? "text-blue-300" : "text-blue-700"
-                    }`}
-                  >
-                    Service Level
-                  </div>
-                  <div
-                    className={`text-base font-semibold ${
-                      darkMode ? "text-blue-100" : "text-blue-900"
-                    }`}
-                  >
-                    Level {serviceLevel}
-                  </div>
-                  <div
-                    className={`text-sm ${
-                      darkMode ? "text-blue-300" : "text-blue-700"
-                    }`}
-                  >
-                    {SERVICE_LEVEL_DESC[serviceLevel]}
-                  </div>
-                </div>
-                {currentPricing && (
-                  <div>
-                    <div
-                      className={`text-xs uppercase font-medium ${
-                        darkMode ? "text-blue-300" : "text-blue-700"
-                      }`}
-                    >
-                      Price Range for This Level
-                    </div>
-                    <div
-                      className={`text-base font-semibold ${
-                        darkMode ? "text-blue-100" : "text-blue-900"
-                      }`}
-                    >
-                      {money(currentPricing.base_price_usd)} -{" "}
-                      {money(currentPricing.base_plus_options_usd)}
-                    </div>
-                    <div
-                      className={`text-sm ${
-                        darkMode ? "text-blue-300" : "text-blue-700"
-                      }`}
-                    >
-                      Base to Base + Options
-                    </div>
-                  </div>
-                )}
-              </div>
-              {selectedLabCapability && (
-                <div
-                  className={`border-t pt-3 ${
-                    darkMode ? "border-blue-700" : "border-blue-200"
-                  }`}
-                >
-                  <div
-                    className={`text-xs uppercase font-medium mb-2 ${
-                      darkMode ? "text-blue-300" : "text-blue-700"
-                    }`}
-                  >
-                    Selected Lab Details
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                      <div
-                        className={`text-xs ${
-                          darkMode ? "text-blue-400" : "text-blue-600"
-                        }`}
-                      >
-                        Lab
-                      </div>
-                      <div
-                        className={`font-semibold ${
-                          darkMode ? "text-blue-100" : "text-blue-900"
-                        }`}
-                      >
-                        {selectedLabCapability.labName}
-                      </div>
-                    </div>
-                    <div>
-                      <div
-                        className={`text-xs ${
-                          darkMode ? "text-blue-400" : "text-blue-600"
-                        }`}
-                      >
-                        Turn Time
-                      </div>
-                      <div
-                        className={`font-semibold ${
-                          darkMode ? "text-blue-100" : "text-blue-900"
-                        }`}
-                      >
-                        <span
-                          className={clsx(
-                            "inline-block px-2 py-0.5 rounded-full text-xs",
-                            ttColor(selectedLabCapability.recalTT)
-                          )}
-                        >
-                          {selectedLabCapability.recalTT} days
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <div
-                        className={`text-xs ${
-                          darkMode ? "text-blue-400" : "text-blue-600"
-                        }`}
-                      >
-                        Accreditation
-                      </div>
-                      <div
-                        className={`font-semibold text-xs ${
-                          darkMode ? "text-blue-100" : "text-blue-900"
-                        }`}
-                      >
-                        {selectedLabCapability.isAccredited ? (
-                          <span
-                            className={`inline-block px-2 py-0.5 rounded ${
-                              darkMode
-                                ? "bg-green-900/50 text-green-300"
-                                : "bg-green-100 text-green-800"
-                            }`}
-                          >
-                            Accredited
-                          </span>
-                        ) : (
-                          <span
-                            className={`inline-block px-2 py-0.5 rounded ${
-                              darkMode
-                                ? "bg-gray-700 text-gray-300"
-                                : "bg-slate-100 text-slate-600"
-                            }`}
-                          >
-                            Non-Accredited
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Lab Capabilities Summary */}
-          <section>
-            <h3
-              className={`text-lg font-semibold mb-3 flex items-center gap-2 ${
-                darkMode ? "text-white" : "text-slate-900"
-              }`}
-            >
-              <span>Lab Capabilities Summary</span>
-            </h3>
-            <div className="overflow-auto border border-slate-200 rounded-lg">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50">
-                  <tr className="text-left text-slate-600">
-                    <th className="py-2 px-3 w-8"></th>
-                    <th className="py-2 px-3">Lab</th>
-                    <th className="py-2 px-3">Accredited</th>
-                    <th className="py-2 px-3">Standards</th>
-                    <th className="py-2 px-3">Lab Capacity</th>
-                    <th className="py-2 px-3">Stock TT</th>
-                    <th className="py-2 px-3">Recal TT</th>
-                    <th className="py-2 px-3">Repair TT</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {capsWithStandards.map((cap, i) => {
-                    const isExpanded = expandedLabs.has(cap.labCode);
-                    const isSelected = cap.labName === selectedLab;
-                    return (
-                      <React.Fragment key={i}>
-                        <tr
-                          className={clsx(
-                            `border-t border-slate-100 cursor-pointer ${
-                              darkMode
-                                ? "hover:bg-gray-800"
-                                : "hover:bg-slate-50"
-                            }`,
-                            isSelected &&
-                              (darkMode
-                                ? "bg-blue-900/30 font-medium"
-                                : "bg-blue-50 font-medium")
-                          )}
-                          onClick={() => toggleLab(cap.labCode)}
-                        >
-                          <td className="py-2 px-3">
-                            <span className="text-slate-400">
-                              {isExpanded ? "▼" : "▶"}
-                            </span>
-                          </td>
-                          <td className="py-2 px-3 whitespace-nowrap font-medium">
-                            {cap.labName}
-                            {isSelected && (
-                              <span className="ml-2 text-blue-600">✓</span>
-                            )}
-                          </td>
-                          <td className="py-2 px-3 whitespace-nowrap">
-                            {cap.isAccredited ? (
-                              <span className="text-green-600">✓ Yes</span>
-                            ) : (
-                              <span className="text-slate-400">No</span>
-                            )}
-                          </td>
-                          <td className="py-2 px-3 whitespace-nowrap text-blue-600 font-medium">
-                            {cap.matchingStandards.length} matching
-                          </td>
-                          <td className="py-2 px-3">
-                            {(() => {
-                              const capacity = LAB_CAPACITY[cap.labName] || 50;
-                              const barColor = getCapacityColor(capacity);
-                              const textColor = getCapacityTextColor(capacity);
-
-                              return (
-                                <div className="flex items-center gap-2">
-                                  <div className="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden min-w-[80px] max-w-[120px]">
-                                    <div
-                                      className={`h-full ${barColor} transition-all duration-300`}
-                                      style={{ width: `${capacity}%` }}
-                                    />
-                                  </div>
-                                  <span
-                                    className={`text-xs font-medium ${textColor} min-w-[35px]`}
-                                  >
-                                    {capacity}%
-                                  </span>
-                                </div>
-                              );
-                            })()}
-                          </td>
-                          <td className="py-2 px-3 whitespace-nowrap">
-                            <span
-                              className={clsx(
-                                "inline-block px-2 py-0.5 rounded-full text-xs",
-                                ttColor(cap.stockTT)
-                              )}
-                            >
-                              {cap.stockTT} days
-                            </span>
-                          </td>
-                          <td className="py-2 px-3 whitespace-nowrap">
-                            <span
-                              className={clsx(
-                                "inline-block px-2 py-0.5 rounded-full text-xs",
-                                ttColor(cap.recalTT)
-                              )}
-                            >
-                              {cap.recalTT} days
-                            </span>
-                          </td>
-                          <td className="py-2 px-3 whitespace-nowrap">
-                            <span
-                              className={clsx(
-                                "inline-block px-2 py-0.5 rounded-full text-xs",
-                                ttColor(cap.repairTT)
-                              )}
-                            >
-                              {cap.repairTT} days
-                            </span>
-                          </td>
-                        </tr>
-                        {isExpanded && (
-                          <tr className="border-t border-slate-100 bg-slate-50">
-                            <td></td>
-                            <td colSpan={7} className="py-3 px-3">
-                              <div className="text-xs font-semibold text-slate-700 mb-2">
-                                Matching Standards at {cap.labName}:
-                              </div>
-                              <div className="space-y-1">
-                                {cap.matchingStandards.map((std, stdIdx) => (
-                                  <div
-                                    key={stdIdx}
-                                    className="flex items-center gap-3 text-xs py-1 px-2 bg-white rounded border border-slate-200"
-                                  >
-                                    <span className="font-mono text-slate-600">
-                                      {std.standardId}
-                                    </span>
-                                    <span className="font-medium text-slate-900">
-                                      {std.make} {std.model}
-                                    </span>
-                                    <span className="text-slate-500">
-                                      {std.capabilityTags.join(", ")}
-                                    </span>
-                                    {std.onsiteCapable && (
-                                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
-                                        Onsite OK
-                                      </span>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          {/* Pricing Table for All Levels */}
-          <section>
-            <h3 className="text-lg font-semibold text-slate-900 mb-3">
-              All Service Level Pricing
-            </h3>
-            <div className="overflow-auto border border-slate-200 rounded-lg">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50">
-                  <tr className="text-left text-slate-600">
-                    <th className="py-2 px-3">Level</th>
-                    <th className="py-2 px-3">Description</th>
-                    <th className="py-2 px-3">Base Price</th>
-                    <th className="py-2 px-3">Base + Options</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pricingRows.map((p, i) => (
-                    <tr
-                      key={i}
-                      className={clsx(
-                        "border-t border-slate-100",
-                        p.service_level === serviceLevel &&
-                          "bg-blue-50 font-medium"
-                      )}
-                    >
-                      <td className="py-2 px-3">
-                        {p.service_level}
-                        {p.service_level === serviceLevel && (
-                          <span className="ml-2 text-blue-600">✓</span>
-                        )}
-                      </td>
-                      <td className="py-2 px-3 text-slate-700">
-                        {SERVICE_LEVEL_DESC[p.service_level]}
-                      </td>
-                      <td className="py-2 px-3 font-semibold">
-                        {money(p.base_price_usd)}
-                      </td>
-                      <td className="py-2 px-3">
-                        {money(p.base_plus_options_usd)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </div>
-
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-slate-50 border-t border-slate-200 px-6 py-4 flex justify-end rounded-b-2xl">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Upload Page Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function UploadPage({
   fileInputRef,
   onFileUpload,
@@ -3519,7 +2910,7 @@ function UploadPage({
       <div className="glass-card p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">📤</span>
+            <span className="text-3xl">ðŸ“¤</span>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
                 Upload Customer List
@@ -3535,7 +2926,7 @@ function UploadPage({
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 text-sm font-medium"
               title="Clear all data and start fresh"
             >
-              🔄 Reset All
+              ðŸ”„ Reset All
             </button>
           )}
         </div>
@@ -3551,7 +2942,7 @@ function UploadPage({
             />
             <div className="relative z-0">
               <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="text-3xl">📁</span>
+                <span className="text-3xl">ðŸ“</span>
               </div>
               <p className="text-sm font-medium text-gray-700 mb-1">
                 Drop CSV file here or click to browse
@@ -3571,7 +2962,7 @@ function UploadPage({
           }`}
         >
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">📋</span>
+            <span className="text-lg">ðŸ“‹</span>
             <p
               className={`font-semibold text-sm ${
                 darkMode ? "text-white" : "text-gray-900"
@@ -3593,7 +2984,7 @@ function UploadPage({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div className="flex items-start gap-2">
-              <span className="text-green-600 font-bold">✓</span>
+              <span className="text-green-600 font-bold">âœ“</span>
               <div>
                 <strong className={darkMode ? "text-white" : "text-gray-900"}>
                   Required:
@@ -3605,7 +2996,7 @@ function UploadPage({
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold">•</span>
+              <span className="text-blue-600 font-bold">â€¢</span>
               <div>
                 <strong className={darkMode ? "text-white" : "text-gray-900"}>
                   Optional:
@@ -3636,13 +3027,13 @@ function UploadPage({
       {errors.length > 0 && (
         <div className="glass-card p-5 bg-gradient-to-r from-red-50 to-rose-50 border-red-200 animate-fade-in">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">⚠️</span>
+            <span className="text-2xl">âš ï¸</span>
             <h3 className="text-red-900 font-bold">Errors Detected</h3>
           </div>
           <ul className="text-red-700 text-sm space-y-2">
             {errors.map((error, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="text-red-500 font-bold">•</span>
+                <span className="text-red-500 font-bold">â€¢</span>
                 {error}
               </li>
             ))}
@@ -3654,13 +3045,13 @@ function UploadPage({
       {warnings.length > 0 && (
         <div className="glass-card p-5 bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200 animate-fade-in">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">⚡</span>
+            <span className="text-2xl">âš¡</span>
             <h3 className="text-amber-900 font-bold">Warnings</h3>
           </div>
           <ul className="text-amber-700 text-sm space-y-2">
             {warnings.map((warning, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="text-amber-500 font-bold">•</span>
+                <span className="text-amber-500 font-bold">â€¢</span>
                 {warning}
               </li>
             ))}
@@ -3672,7 +3063,7 @@ function UploadPage({
       {results.length > 0 && (
         <>
           <div className="flex items-center gap-3">
-            <span className="text-2xl">📊</span>
+            <span className="text-2xl">ðŸ“Š</span>
             <h3
               className={`text-xl font-bold ${
                 darkMode ? "text-white" : "text-gray-900"
@@ -3794,7 +3185,7 @@ function UploadPage({
 
               return (
                 <DonutChart
-                  title="🏭 Lab Distribution"
+                  title="ðŸ­ Lab Distribution"
                   data={chartData}
                   darkMode={darkMode}
                 />
@@ -3855,7 +3246,7 @@ function UploadPage({
 
                 return (
                   <HorizontalBarChart
-                    title="💰 Cost by Service Level"
+                    title="ðŸ’° Cost by Service Level"
                     data={chartData.map((item) => ({
                       ...item,
                       label: `Level ${item.label.replace("L", "")} - ${
@@ -3895,7 +3286,7 @@ function UploadPage({
           return (
             <div className="glass-card p-6 animate-fade-in">
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl">💡</span>
+                <span className="text-2xl">ðŸ’¡</span>
                 <h3 className="text-xl font-bold text-gray-900">
                   Smart Recommendations
                 </h3>
@@ -3917,10 +3308,10 @@ function UploadPage({
                   >
                     <span className="text-lg flex-shrink-0">
                       {rec.type === "warning"
-                        ? "⚠️"
+                        ? "âš ï¸"
                         : rec.type === "info"
-                        ? "ℹ️"
-                        : "✅"}
+                        ? "â„¹ï¸"
+                        : "âœ…"}
                     </span>
                     <div className="flex-1">{rec.message}</div>
                   </div>
@@ -3953,19 +3344,19 @@ function UploadPage({
                   onClick={() => handleOptimize("minimize_cost")}
                   className="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  💰 Minimize Cost
+                  ðŸ’° Minimize Cost
                 </button>
                 <button
                   onClick={() => handleOptimize("minimize_time")}
                   className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  ⚡ Minimize Time
+                  âš¡ Minimize Time
                 </button>
                 <button
                   onClick={() => handleOptimize("balance_capacity")}
                   className="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  ⚖️ Balance Capacity
+                  âš–ï¸ Balance Capacity
                 </button>
               </div>
             </div>
@@ -3982,13 +3373,13 @@ function UploadPage({
                   onClick={saveQuoteSession}
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  💾 Save Quote
+                  ðŸ’¾ Save Quote
                 </button>
                 <button
                   onClick={loadQuoteSession}
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  📂 Load Quote
+                  ðŸ“‚ Load Quote
                 </button>
               </div>
             </div>
@@ -4011,7 +3402,7 @@ function UploadPage({
                 darkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              <span>🎯 Bulk Actions</span>
+              <span>ðŸŽ¯ Bulk Actions</span>
               <span
                 className={`text-xs px-2 py-1 rounded-full ${
                   darkMode
@@ -4067,7 +3458,7 @@ function UploadPage({
                   darkMode ? "text-indigo-400" : "text-indigo-600"
                 }`}
               >
-                ℹ️ Uses closest alternative if selected lab lacks capability
+                â„¹ï¸ Uses closest alternative if selected lab lacks capability
               </div>
             </div>
             <div>
@@ -4116,7 +3507,7 @@ function UploadPage({
                       : "bg-indigo-100 hover:bg-indigo-200 text-indigo-700"
                   }`}
                 >
-                  💰 Base Price
+                  ðŸ’° Base Price
                 </button>
                 <button
                   onClick={() => applyBulkBasePrice(false)}
@@ -4126,7 +3517,7 @@ function UploadPage({
                       : "bg-indigo-100 hover:bg-indigo-200 text-indigo-700"
                   }`}
                 >
-                  💎 Base + Options
+                  ðŸ’Ž Base + Options
                 </button>
               </div>
               <div
@@ -4134,7 +3525,7 @@ function UploadPage({
                   darkMode ? "text-indigo-400" : "text-indigo-600"
                 }`}
               >
-                ℹ️ Applies to current service level for each item
+                â„¹ï¸ Applies to current service level for each item
               </div>
             </div>
           </div>
@@ -4381,7 +3772,7 @@ function UploadPage({
                             <span>{result.customerItem.row}</span>
                             {showExpandArrow && (
                               <span className="text-slate-400">
-                                {isExpanded ? "▼" : "▶"}
+                                {isExpanded ? "â–¼" : "â–¶"}
                               </span>
                             )}
                             {isExactMatch && hasMatches && !showExpandArrow && (
@@ -4389,7 +3780,7 @@ function UploadPage({
                                 className="text-xs text-blue-600"
                                 title="Click to configure"
                               >
-                                ⚙️
+                                âš™ï¸
                               </span>
                             )}
                           </div>
@@ -4411,7 +3802,7 @@ function UploadPage({
                                 );
                                 return matchQuality.isExact ? (
                                   <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium w-fit">
-                                    ✓ Exact Match
+                                    âœ“ Exact Match
                                   </span>
                                 ) : matchQuality.quality >= 60 ? (
                                   <span className="inline-block px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-medium w-fit">
@@ -4419,13 +3810,13 @@ function UploadPage({
                                   </span>
                                 ) : (
                                   <span className="inline-block px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-xs font-medium w-fit">
-                                    ⚠ {matchQuality.quality}% Match
+                                    âš  {matchQuality.quality}% Match
                                   </span>
                                 );
                               })()}
                             {!hasMatches && (
                               <span className="inline-block px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium w-fit">
-                                ✗ No Match
+                                âœ— No Match
                               </span>
                             )}
                           </div>
@@ -4538,7 +3929,7 @@ function UploadPage({
                               );
                             })()
                           ) : (
-                            <span className="text-slate-400 text-sm">—</span>
+                            <span className="text-slate-400 text-sm">â€”</span>
                           )}
                         </td>
                         <td className="py-3 px-4">
@@ -4547,7 +3938,7 @@ function UploadPage({
                             if (!selectedLabName) {
                               return (
                                 <span className="text-slate-400 text-sm">
-                                  —
+                                  â€”
                                 </span>
                               );
                             }
@@ -4670,7 +4061,7 @@ function UploadPage({
                                       : "text-blue-600"
                                   }`}
                                 >
-                                  📍 {getSelectedLab(i)}
+                                  ðŸ“ {getSelectedLab(i)}
                                 </div>
                                 {transferLabs.has(i) &&
                                   preferredLab &&
@@ -4683,7 +4074,7 @@ function UploadPage({
                                             : "bg-orange-100 text-orange-700 border border-orange-300"
                                         }`}
                                       >
-                                        🔄 Transfer from {preferredLab}
+                                        ðŸ”„ Transfer from {preferredLab}
                                       </span>
                                     </div>
                                   )}
@@ -4696,7 +4087,7 @@ function UploadPage({
                                           : "bg-purple-100 text-purple-700 border border-purple-300"
                                       }`}
                                     >
-                                      🏢 Transfer for TMS
+                                      ðŸ¢ Transfer for TMS
                                     </span>
                                   </div>
                                 )}
@@ -4809,7 +4200,7 @@ function UploadPage({
                                             {unit.description}
                                           </div>
                                           <div className="text-xs text-blue-600 mt-1 font-medium">
-                                            ⏱ {(unit.standardTime || 0).toFixed(1)} hrs
+                                            â± {(unit.standardTime || 0).toFixed(1)} hrs
                                           </div>
                                           <div className="mt-2 flex gap-1">
                                             {(() => {
@@ -5221,7 +4612,7 @@ function UploadPage({
                                               className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                                               title="Remove capability - this lab cannot do this item"
                                             >
-                                              ❌ Remove Capability
+                                              âŒ Remove Capability
                                             </button>
                                           </div>
                                         )}
@@ -5239,7 +4630,7 @@ function UploadPage({
                                           className="px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
                                           title="Add capability to other labs"
                                         >
-                                          ✅ Add Capability
+                                          âœ… Add Capability
                                         </button>
                                       </div>
 
@@ -5385,7 +4776,7 @@ function UploadPage({
                   darkMode ? "hover:text-gray-300" : "hover:text-gray-600"
                 }`}
               >
-                ✕
+                âœ•
               </button>
             </div>
 
@@ -5441,11 +4832,11 @@ function UploadPage({
                           darkMode ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        {lab.region} • {lab.matchingStandards.length} matching
+                        {lab.region} â€¢ {lab.matchingStandards.length} matching
                         standards
                         {lab.isAccredited && (
                           <span className="ml-2 text-green-600">
-                            ✓ Accredited
+                            âœ“ Accredited
                           </span>
                         )}
                       </div>
@@ -5511,9 +4902,9 @@ function UploadPage({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Main App Component - Wraps AppContent with Context Providers
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function App() {
   return (
