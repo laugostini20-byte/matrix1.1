@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   LABS,
   getStandardsForPN,
@@ -36,9 +36,9 @@ import {
   getTMSVendorsForUnitHelper,
 } from "../../top-level";
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Upload Page Component
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 export type UploadPageProps = {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -420,7 +420,7 @@ export function UploadPage({
       <div className="glass-card p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">ðŸ“¤</span>
+            <span className="text-3xl">📤</span>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
                 Upload Customer List
@@ -436,7 +436,7 @@ export function UploadPage({
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 text-sm font-medium"
               title="Clear all data and start fresh"
             >
-              ðŸ”„ Reset All
+              🔄 Reset All
             </button>
           )}
         </div>
@@ -452,7 +452,7 @@ export function UploadPage({
             />
             <div className="relative z-0">
               <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="text-3xl">ðŸ“</span>
+                <span className="text-3xl">📁</span>
               </div>
               <p className="text-sm font-medium text-gray-700 mb-1">
                 Drop CSV file here or click to browse
@@ -472,7 +472,7 @@ export function UploadPage({
           }`}
         >
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">ðŸ“‹</span>
+            <span className="text-lg">📋</span>
             <p
               className={`font-semibold text-sm ${
                 darkMode ? "text-white" : "text-gray-900"
@@ -494,7 +494,7 @@ export function UploadPage({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div className="flex items-start gap-2">
-              <span className="text-green-600 font-bold">âœ“</span>
+              <span className="text-green-600 font-bold">✓</span>
               <div>
                 <strong className={darkMode ? "text-white" : "text-gray-900"}>
                   Required:
@@ -506,7 +506,7 @@ export function UploadPage({
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold">â€¢</span>
+              <span className="text-blue-600 font-bold">•</span>
               <div>
                 <strong className={darkMode ? "text-white" : "text-gray-900"}>
                   Optional:
@@ -537,13 +537,13 @@ export function UploadPage({
       {errors.length > 0 && (
         <div className="glass-card p-5 bg-gradient-to-r from-red-50 to-rose-50 border-red-200 animate-fade-in">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">âš ï¸</span>
+            <span className="text-2xl">⚠️</span>
             <h3 className="text-red-900 font-bold">Errors Detected</h3>
           </div>
           <ul className="text-red-700 text-sm space-y-2">
             {errors.map((error, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="text-red-500 font-bold">â€¢</span>
+                <span className="text-red-500 font-bold">•</span>
                 {error}
               </li>
             ))}
@@ -555,13 +555,13 @@ export function UploadPage({
       {warnings.length > 0 && (
         <div className="glass-card p-5 bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200 animate-fade-in">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">âš¡</span>
+            <span className="text-2xl">⚡</span>
             <h3 className="text-amber-900 font-bold">Warnings</h3>
           </div>
           <ul className="text-amber-700 text-sm space-y-2">
             {warnings.map((warning, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="text-amber-500 font-bold">â€¢</span>
+                <span className="text-amber-500 font-bold">•</span>
                 {warning}
               </li>
             ))}
@@ -573,7 +573,7 @@ export function UploadPage({
       {results.length > 0 && (
         <>
           <div className="flex items-center gap-3">
-            <span className="text-2xl">ðŸ“Š</span>
+            <span className="text-2xl">📊</span>
             <h3
               className={`text-xl font-bold ${
                 darkMode ? "text-white" : "text-gray-900"
@@ -695,7 +695,7 @@ export function UploadPage({
 
               return (
                 <DonutChart
-                  title="ðŸ­ Lab Distribution"
+                  title="🏭 Lab Distribution"
                   data={chartData}
                   darkMode={darkMode}
                 />
@@ -756,7 +756,7 @@ export function UploadPage({
 
                 return (
                   <HorizontalBarChart
-                    title="ðŸ’° Cost by Service Level"
+                    title="💰 Cost by Service Level"
                     data={chartData.map((item) => ({
                       ...item,
                       label: `Level ${item.label.replace("L", "")} - ${
@@ -796,7 +796,7 @@ export function UploadPage({
           return (
             <div className="glass-card p-6 animate-fade-in">
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl">ðŸ’¡</span>
+                <span className="text-2xl">💡</span>
                 <h3 className="text-xl font-bold text-gray-900">
                   Smart Recommendations
                 </h3>
@@ -818,10 +818,10 @@ export function UploadPage({
                   >
                     <span className="text-lg flex-shrink-0">
                       {rec.type === "warning"
-                        ? "âš ï¸"
+                        ? "⚠️"
                         : rec.type === "info"
-                        ? "â„¹ï¸"
-                        : "âœ…"}
+                        ? "ℹ️"
+                        : "✅"}
                     </span>
                     <div className="flex-1">{rec.message}</div>
                   </div>
@@ -854,19 +854,19 @@ export function UploadPage({
                   onClick={() => handleOptimize("minimize_cost")}
                   className="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  ðŸ’° Minimize Cost
+                  💰 Minimize Cost
                 </button>
                 <button
                   onClick={() => handleOptimize("minimize_time")}
                   className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  âš¡ Minimize Time
+                  ⚡ Minimize Time
                 </button>
                 <button
                   onClick={() => handleOptimize("balance_capacity")}
                   className="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  âš–ï¸ Balance Capacity
+                  ⚖️ Balance Capacity
                 </button>
               </div>
             </div>
@@ -883,13 +883,13 @@ export function UploadPage({
                   onClick={saveQuoteSession}
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  ðŸ’¾ Save Quote
+                  💾 Save Quote
                 </button>
                 <button
                   onClick={loadQuoteSession}
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
-                  ðŸ“‚ Load Quote
+                  📂 Load Quote
                 </button>
               </div>
             </div>
@@ -912,7 +912,7 @@ export function UploadPage({
                 darkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              <span>ðŸŽ¯ Bulk Actions</span>
+              <span>🎯 Bulk Actions</span>
               <span
                 className={`text-xs px-2 py-1 rounded-full ${
                   darkMode
@@ -968,7 +968,7 @@ export function UploadPage({
                   darkMode ? "text-indigo-400" : "text-indigo-600"
                 }`}
               >
-                â„¹ï¸ Uses closest alternative if selected lab lacks capability
+                ℹ️ Uses closest alternative if selected lab lacks capability
               </div>
             </div>
             <div>
@@ -1017,7 +1017,7 @@ export function UploadPage({
                       : "bg-indigo-100 hover:bg-indigo-200 text-indigo-700"
                   }`}
                 >
-                  ðŸ’° Base Price
+                  💰 Base Price
                 </button>
                 <button
                   onClick={() => applyBulkBasePrice(false)}
@@ -1027,7 +1027,7 @@ export function UploadPage({
                       : "bg-indigo-100 hover:bg-indigo-200 text-indigo-700"
                   }`}
                 >
-                  ðŸ’Ž Base + Options
+                  💎 Base + Options
                 </button>
               </div>
               <div
@@ -1035,7 +1035,7 @@ export function UploadPage({
                   darkMode ? "text-indigo-400" : "text-indigo-600"
                 }`}
               >
-                â„¹ï¸ Applies to current service level for each item
+                ℹ️ Applies to current service level for each item
               </div>
             </div>
           </div>
@@ -1281,7 +1281,7 @@ export function UploadPage({
                             <span>{result.customerItem.row}</span>
                             {showExpandArrow && (
                               <span className="text-slate-400">
-                                {isExpanded ? "â–¼" : "â–¶"}
+                                {isExpanded ? "▼" : "▶"}
                               </span>
                             )}
                             {isExactMatch && hasMatches && !showExpandArrow && (
@@ -1289,7 +1289,7 @@ export function UploadPage({
                                 className="text-xs text-blue-600"
                                 title="Click to configure"
                               >
-                                âš™ï¸
+                                ⚙️
                               </span>
                             )}
                           </div>
@@ -1311,7 +1311,7 @@ export function UploadPage({
                                 );
                                 return matchQuality.isExact ? (
                                   <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium w-fit">
-                                    âœ“ Exact Match
+                                    ✓ Exact Match
                                   </span>
                                 ) : matchQuality.quality >= 60 ? (
                                   <span className="inline-block px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-medium w-fit">
@@ -1319,13 +1319,13 @@ export function UploadPage({
                                   </span>
                                 ) : (
                                   <span className="inline-block px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-xs font-medium w-fit">
-                                    âš  {matchQuality.quality}% Match
+                                    ⚠ {matchQuality.quality}% Match
                                   </span>
                                 );
                               })()}
                             {!hasMatches && (
                               <span className="inline-block px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium w-fit">
-                                âœ— No Match
+                                ✗ No Match
                               </span>
                             )}
                           </div>
@@ -1438,7 +1438,7 @@ export function UploadPage({
                               );
                             })()
                           ) : (
-                            <span className="text-slate-400 text-sm">â€”</span>
+                            <span className="text-slate-400 text-sm">—</span>
                           )}
                         </td>
                         <td className="py-3 px-4">
@@ -1447,7 +1447,7 @@ export function UploadPage({
                             if (!selectedLabName) {
                               return (
                                 <span className="text-slate-400 text-sm">
-                                  â€”
+                                  —
                                 </span>
                               );
                             }
@@ -1570,7 +1570,7 @@ export function UploadPage({
                                       : "text-blue-600"
                                   }`}
                                 >
-                                  ðŸ“ {getSelectedLab(i)}
+                                  📍 {getSelectedLab(i)}
                                 </div>
                                 {transferLabs.has(i) &&
                                   preferredLab &&
@@ -1583,7 +1583,7 @@ export function UploadPage({
                                             : "bg-orange-100 text-orange-700 border border-orange-300"
                                         }`}
                                       >
-                                        ðŸ”„ Transfer from {preferredLab}
+                                        🔄 Transfer from {preferredLab}
                                       </span>
                                     </div>
                                   )}
@@ -1596,7 +1596,7 @@ export function UploadPage({
                                           : "bg-purple-100 text-purple-700 border border-purple-300"
                                       }`}
                                     >
-                                      ðŸ¢ Transfer for TMS
+                                      🏢 Transfer for TMS
                                     </span>
                                   </div>
                                 )}
@@ -1709,7 +1709,7 @@ export function UploadPage({
                                             {unit.description}
                                           </div>
                                           <div className="text-xs text-blue-600 mt-1 font-medium">
-                                            â± {(unit.standardTime || 0).toFixed(1)} hrs
+                                            ⏱ {(unit.standardTime || 0).toFixed(1)} hrs
                                           </div>
                                           <div className="mt-2 flex gap-1">
                                             {(() => {
@@ -2121,7 +2121,7 @@ export function UploadPage({
                                               className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                                               title="Remove capability - this lab cannot do this item"
                                             >
-                                              âŒ Remove Capability
+                                              ❌ Remove Capability
                                             </button>
                                           </div>
                                         )}
@@ -2139,7 +2139,7 @@ export function UploadPage({
                                           className="px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
                                           title="Add capability to other labs"
                                         >
-                                          âœ… Add Capability
+                                          ✅ Add Capability
                                         </button>
                                       </div>
 
@@ -2285,7 +2285,7 @@ export function UploadPage({
                   darkMode ? "hover:text-gray-300" : "hover:text-gray-600"
                 }`}
               >
-                âœ•
+                ✕
               </button>
             </div>
 
@@ -2341,11 +2341,11 @@ export function UploadPage({
                           darkMode ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        {lab.region} â€¢ {lab.matchingStandards.length} matching
+                        {lab.region} • {lab.matchingStandards.length} matching
                         standards
                         {lab.isAccredited && (
                           <span className="ml-2 text-green-600">
-                            âœ“ Accredited
+                            ✓ Accredited
                           </span>
                         )}
                       </div>
