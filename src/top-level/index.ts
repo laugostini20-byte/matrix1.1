@@ -7,9 +7,7 @@ export * from "./upload";
 export * from "./quote-summary";
 export * from "./export-utils";
 export * from "./pricing-utils";
-export * from "./diagnostics";
 
-// Explicitly re-export optimization utilities to avoid conflicts
 export type {
   Recommendation,
   OptimizationStrategy,
