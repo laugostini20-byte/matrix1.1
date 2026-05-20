@@ -1232,9 +1232,8 @@ export function UploadPage({
                   const showExpandArrow = hasMultipleMatches && !isExactMatch;
 
                   return (
-                    <>
+                    <React.Fragment key={i}>
                       <tr
-                        key={i}
                         className={`border-t border-slate-100 ${
                           darkMode ? "hover:bg-gray-800" : "hover:bg-slate-50"
                         } ${
@@ -2161,7 +2160,7 @@ export function UploadPage({
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   );
                 })}
               </tbody>
