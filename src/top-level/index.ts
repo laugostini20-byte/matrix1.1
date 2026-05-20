@@ -8,8 +8,6 @@ export * from "./quote-summary";
 export * from "./export-utils";
 export * from "./pricing-utils";
 export * from "./diagnostics";
-export * from "./modals";
-export * from "./upload-page";
 
 // Explicitly re-export optimization utilities to avoid conflicts
 export type {
